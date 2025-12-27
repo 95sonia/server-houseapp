@@ -11,7 +11,7 @@ const {check} = require('express-validator') // lo usaremos mas adelante para va
     // const { } = require("../middlewares/nombrearchivo")
 
 //HOME Y BUSCADOR (GET) Vista inicio de la app
-router.get('/', /* houseController */);
+router.get('/home', /* houseController */);
 
 //REGISTRO (POST) 
 router.post('/register'/*, [validacion] , controlador*/)

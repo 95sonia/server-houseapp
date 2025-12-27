@@ -13,13 +13,13 @@ const { check } = require('express-validator')
 // const { verifyToken } = require("../middlewares/");
 
 // Ver panel principal con todas las casas y buscador (GET)
-router.get('/houses', /*  */);
+router.get('/viviendas', /*  */);
 
 // Ver detalles de una casa específica (GET)
-router.get('/houses/:id', /* */);
+router.get('/viviendas/:id', /* */);
 
 // Ver ofertas especiales (GET)
-router.get('/offers', /* */);
+router.get('/ofertas', /* */);
 
 
 //--------ACCIONES DE USUARIO (Requieren verifyToken) ---
@@ -42,6 +42,6 @@ router.delete('/favoritos/:id', /* [verifyToken],  */);
 //--------PERFIL DE USUARIO ---
 
 // Modificar mis datos de usuario (PUT)
-router.put('/miperfil', /* [verifyToken], */);
+router.put('/perfil', /* [verifyToken], */);
 
 module.exports = router;
