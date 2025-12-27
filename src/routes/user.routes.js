@@ -13,35 +13,35 @@ const { check } = require('express-validator')
 // const { verifyToken } = require("../middlewares/");
 
 // Ver panel principal con todas las casas y buscador (GET)
-router.get('/viviendas', /*  */);
+// router.get('/viviendas', /*  */);
 
-// Ver detalles de una casa específica (GET)
-router.get('/viviendas/:id', /* */);
+// // Ver detalles de una casa específica (GET)
+// router.get('/viviendas/:id', /* */);
 
-// Ver ofertas especiales (GET)
-router.get('/ofertas', /* */);
-
-
-//--------ACCIONES DE USUARIO (Requieren verifyToken) ---
-
-// Reservar una casa (POST)
-router.post('/reservar', /* [verifyToken],  */);
+// // Ver ofertas especiales (GET)
+// router.get('/ofertas', /* */);
 
 
-//--------GESTIÓN DE FAVORITOS ---
+// //--------ACCIONES DE USUARIO (Requieren verifyToken) ---
 
-// Ver mis favoritos (GET)
-router.get('/favoritos', /* [verifyToken],  */);
+// // Reservar una casa (POST)
+// router.post('/reservar', /* [verifyToken],  */);
 
-// Añadir a favoritos (POST)
-router.post('/favoritos/:id', /* [verifyToken], */);
 
-// Eliminar de favoritos (DELETE)
-router.delete('/favoritos/:id', /* [verifyToken],  */);
+// //--------GESTIÓN DE FAVORITOS ---
 
-//--------PERFIL DE USUARIO ---
+// // Ver mis favoritos (GET)
+// router.get('/favoritos', /* [verifyToken],  */);
 
-// Modificar mis datos de usuario (PUT)
-router.put('/perfil', /* [verifyToken], */);
+// // Añadir a favoritos (POST)
+// router.post('/favoritos/:id', /* [verifyToken], */);
+
+// // Eliminar de favoritos (DELETE)
+// router.delete('/favoritos/:id', /* [verifyToken],  */);
+
+// //--------PERFIL DE USUARIO ---
+
+// // Modificar mis datos de usuario (PUT)
+// router.put('/perfil', /* [verifyToken], */);
 
 module.exports = router;
