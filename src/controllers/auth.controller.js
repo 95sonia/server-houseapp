@@ -41,12 +41,19 @@ const createUser = async (req, res) => {
         const token = await JWTGenerator(payload)
         console.log({ token }, 'desde authcontroller backend')
 
+        // Configurar la cookie antes de enviar la respuesta JSON
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 3600000, // 1 hora
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax'
+        });
+
         //Respuesta favorable
         return res.status(200).json({
             ok: true,
             msg: 'Usuario creado correctamente',
-            user: savedUser,
-            token
+            user: { uid: savedUser._id, nombre: savedUser.nombre, role: savedUser.role }
         })
 
     } catch (error) {
@@ -94,6 +101,15 @@ const loginUser = async (req, res) => {
         const token = await JWTGenerator(payload)
         console.log({ token }, 'desde login backend')
 
+
+        //Configuracion cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 3600000, // 1 hora
+            secure: process.env.NODE_ENV === 'production', // Si el entorno es producción, secure = true; si no pon false
+            sameSite: 'Lax'
+        });
+
         //crear un objeto user para la respuesta
         const user = {
             nombre: usuarioBD.nombre,
@@ -106,8 +122,7 @@ const loginUser = async (req, res) => {
         return res.status(200).json({
             ok: true,
             msg: "Login de usuario exitoso",
-            user: usuarioBD,
-            token
+            user
         })
 
         // capturar y manejar el error con catch
@@ -132,21 +147,35 @@ const renewToken = async (req, res) => {
     const payload = { uid, nombre, role };
     const token = await JWTGenerator(payload);
 
+    // IMPORTANTE: Actualizar la cookie tambien aqui
+    res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: 3600000,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Lax'
+    });
+
     //retornar status
     return res.status(200).json({
         ok: true,
         msg: 'renovando token',
-        user: {
-            uid,
-            nombre,
-            role
-        },
-        token
+        user: { uid, nombre, role }
     })
 }
+
+//FUNCION LOGOUT
+const logOut = (req, res) => {
+    res.clearCookie('token'); // Decir al navegador que destruya la cookie llamada 'token'
+    return res.json({
+        ok: true,
+        msg: 'Sesión cerrada'
+    });
+};
+
 
 module.exports = {
     createUser,
     loginUser,
-    renewToken
+    renewToken,
+    logOut
 }

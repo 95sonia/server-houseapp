@@ -1,17 +1,18 @@
-// Requerir libreria JWT porque lo voy a utilizar en la función
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken'); // Requerir libreria JWT porque lo voy a utilizar en la función
 
 /**
- * Middleware para validar si el token es correcto
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * Middleware para revisar si el usuario tiene un token válido antes de dejarlo pasar a rutas privadas.
+ * Extrae el token de las cookies de la petición, Verifica la validez del token usando la clave secreta.
+ * Si es válido, inyecta los datos del usuario (uid, nombre, role) en req.userToken.
+ * * @param {Object} req - Objeto de petición de Express
+ * @param {Object} res - Objeto de respuesta de Express
+ * @param {Function} next - Función para pasar al siguiente middleware
  */
 const validarJWT = (req, res, next) => {
-    //Recoger el token de headers
-    const token = req.headers['authorization']?.split(' ')[1];
-    // la ? quiere decir si existe no es null ni undefined ejecuta split -> transforma palabras separadas por comas en un array de palabras
-    //console.log(token, 'token de la funcion validateJWT');
+    // Leemos la cookie llamada 'token'
+    const token = req.cookies.token
+    console.log(token, 'token de la funcion validateJWT');
+
     //comprobar si hay token, si no lo hay retornar:
     if (!token) {
         return res.status(401).json({
@@ -29,9 +30,11 @@ const validarJWT = (req, res, next) => {
             nombre: payload.nombre,
             role: payload.role
         }
-
+        // Inyectar los datos del usuario en la peticion (req)
         req.userToken = userToken
         //console.log(req)
+
+        next() // si token válido puede pasar a la ruta -> funcion de express para pasar al siguiente middleware o controlador
 
         // si la verificación no es correcta porque el token no coincide retornar una respuesta, status 401 Unathorized
     } catch (error) {
@@ -42,7 +45,6 @@ const validarJWT = (req, res, next) => {
             msg: 'El Token no es válido'
         })
     }
-    next() // para continuar al siguiente middleware o controlador
 }
 
 module.exports = { validarJWT }

@@ -2,8 +2,9 @@ const express= require('express') // importar express para crear el servidor con
 const mongoose = require('mongoose');
 const cors = require('cors'); // para poder hacer peticiones de front a back sin que el navegador lo bloquee por seguridad
 const path = require('path'); // para utilizarlo abajo, en la carpeta uploads
-
+const cookieParser = require('cookie-parser');
 require('dotenv').config() // para poder usar variables de entorno (ver docu npm)
+
 const dbConnect = require('./config/dbConnect');
 
 const app=express() // hacer uso de express
@@ -21,6 +22,7 @@ const port= process.env.PORT || 4001;
 app.use(cors()); // Para permitir peticiones desde el Frontend - React
 app.use(express.urlencoded({ extended: true })) // docu web de urlencoded npm. desde node para poder parsear el body necesitamos el componente bodyparser
 app.use(express.json()) // para recibir el body en formato JSON
+app.use(cookieParser());
 
 
 // --- CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS (Crucial para Multer) ---

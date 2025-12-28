@@ -10,7 +10,7 @@ const JWTGenerator = (payload) => {
 
     return new Promise((resolve, reject) => {
         jwt.sign(
-            payload, // son los datos que se incluirán en el token
+            payload, // son los datos que se incluirán en el token (que viajan dentro del token)
             process.env.JWT_SECRET_KEY,
             { expiresIn: '3h'},
             (error, token) => {
