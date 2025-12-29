@@ -10,7 +10,7 @@ const validarRol = (...rolesPermitidos) => {
         // El ?. evita que el servidor explote si req.userToken no existe
         const rol = req.userToken?.role;
 
-        //Verificar si rol de usuario está entre los permitidos
+        //Verificar si el rol del usuario está entre los permitidos
         if (!rolesPermitidos.includes(rol)) {
             return res.status(403).json({
                 ok: false,

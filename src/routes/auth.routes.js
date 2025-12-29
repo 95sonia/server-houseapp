@@ -18,7 +18,7 @@ const { validarInputs } = require("../middlewares/validarInputs")
 router.post('/register', [
     check('nombre', 'El nombre es obligatorio').not().isEmpty().isLength({ min: 2 }),
     check('email', 'El email no es válido').isEmail(),
-    check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
+    check('password', 'La contraseña debe tener al menos 6 caracteres').not().isEmpty().isLength({ min: 6 }),
     check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').not().isEmpty().isLength({ min: 9, max:9 }),
     validarInputs // middleware que revisa si los checks anteriores dieron error
 ], createUser);
