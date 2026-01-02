@@ -28,9 +28,9 @@ app.use(express.json()) // para recibir el body en formato JSON
 app.use(cookieParser());
 
 
-// --- CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS (Crucial para Multer) ---
+// --- CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS (para Multer) ---
 // Esto permite que las URLs de imagen sean accesibles
-//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rutas (endpoints)
 // Definir prefijo base para todas las rutas
