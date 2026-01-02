@@ -11,15 +11,18 @@ const { validarJWT } = require("../middlewares/validarJWT")
 const { validarRol } = require("../middlewares/validarRol");
 const { validarInputs } = require("../middlewares/validarInputs")
 
-//HOME Y BUSCADOR (GET) Vista inicio de la app
+//HOME Y BUSCADOR (GET) Vista inicio de la app  
 // router.get('/home');
 
 // //REGISTRO (POST) 
 router.post('/register', [
-    check('nombre', 'El nombre es obligatorio').not().isEmpty().isLength({ min: 2 }),
+    check('nombre')
+        .notEmpty().withMessage('El nombre es obligatorio')
+        .isLength({ min: 2 }).withMessage('Debe tener al menos 2 caracteres')
+        .matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('El nombre solo puede contener letras'),
     check('email', 'El email no es válido').isEmail(),
     check('password', 'La contraseña debe tener al menos 6 caracteres').not().isEmpty().isLength({ min: 6 }),
-    check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').not().isEmpty().isLength({ min: 9, max:9 }),
+    check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').not().isEmpty().isLength({ min: 9, max: 9 }),
     validarInputs // middleware que revisa si los checks anteriores dieron error
 ], createUser);
 

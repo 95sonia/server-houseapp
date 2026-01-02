@@ -114,7 +114,9 @@ const loginUser = async (req, res) => {
         const user = {
             nombre: usuarioBD.nombre,
             email: email,
-            uid: usuarioBD._id
+            uid: usuarioBD._id,
+            role: usuarioBD.role,      
+            telefono: usuarioBD.telefono 
         }
         console.log(user, 'desde login backend')
 
