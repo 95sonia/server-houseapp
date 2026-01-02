@@ -4,7 +4,7 @@ const router = express.Router()
 const { check } = require('express-validator') // lo usaremos mas adelante para validar
 
 //2º Importar controllers (funciones CRUD)
-// const { } = require("../controllers/auth.controller")
+const { createHouse, getAllHouses, getHouseById, editHouseById, deleteHouseById, getAllReservas, editReservaById} = require("../controllers/auth.controller")
 
 //3º Importar Middlewares validar JWT, validar rol y validar inputs
 // const { } = require("../middlewares/nombrearchivo")
@@ -15,28 +15,28 @@ const { validarRol } = require("../middlewares/validarRol");
 //----------------GESTIÓN DE CASAS------------------
 
 //Panel principal admin donde ve todas las casas (GET)
-// router.get('/viviendas', [validarJWT, validarRol('admin')] , controlador)
+router.get('/dashboard', [validarJWT, validarRol('admin')] , getAllHouses)
 
-// //Vista detalles de una casa específica (GET)
-// router.get('/viviendas/:id', [validarJWT, validarRol('admin')] , controlador)
+//Vista detalle de una casa específica (GET)
+router.get('/house/:id', [validarJWT, validarRol('admin')] , getHouseById)
 
-// //Añadir nueva casa (POST)
-// router.post('/viviendas', [validarJWT, validarRol('admin'), upload.single('imagen')] , controlador)
+//Añadir nueva casa (POST)
+router.post('/createHouse', [validarJWT, validarRol('admin'), upload.single('imagen')] , createHouse)
 
-// //Eliminar casa (DELETE)
-// router.delete('/viviendas/:id', [validarJWT, validarRol('admin')], controlador)
+//Editar una casa (PUT)
+router.put('/editHouse/:id', [validarJWT, validarRol('admin')], editHouseById)
 
-// //Editar una casa (PUT)
-// router.put('/viviendas/:id', [validarJWT, validarRol('admin')], controlador)
+//Eliminar casa (DELETE)
+router.delete('/deleteHouse/:id', [validarJWT, validarRol('admin')], deleteHouseById)
 
 
-// //-----------------GESTIÓN DE RESERVAS-----------------
+//-----------------GESTIÓN DE RESERVAS-----------------
 
-// //Ver todas las reservas (GET)
-// router.get('/reservas' , [validarJWT, validarRol('admin')], controlador)
+//Ver todas las reservas (GET)
+router.get('/reservas' , [validarJWT, validarRol('admin')], getAllReservas)
 
-// //Editar una reserva (PUT)
-// router.put('/reservas/:id', [validarJWT, validarRol('admin')], controlador)
+//Editar una reserva (PUT)
+router.put('/reservas/:id', [validarJWT, validarRol('admin')], editReservaById)
 
 
 // //-----------PANEL DE GESTIÓN DE USUARIOS--------------
