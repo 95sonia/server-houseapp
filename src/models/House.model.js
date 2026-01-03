@@ -19,10 +19,14 @@ const HouseSchema = new Schema({
         required: true,
         min: 0
     },
-    imagen: {
-        type: String, // Aquí irá la URL de Multer
+    imagenPrincipal: { // URL única para la portada
+        type: String, 
         required: true
     },
+    imagenes: [{ // Colección de todas las URLs (incluida la principal)
+        type: String, 
+        required: true
+    }],
     descripcion: {
         type: String,
         required: true
@@ -36,3 +40,4 @@ const HouseSchema = new Schema({
 
 //3º exportar el modelo para poder utilizarlo en controllers
 module.exports = model('House', HouseSchema)
+

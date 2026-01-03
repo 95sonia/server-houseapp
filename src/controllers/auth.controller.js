@@ -124,7 +124,8 @@ const loginUser = async (req, res) => {
         return res.status(200).json({
             ok: true,
             msg: "Login de usuario exitoso",
-            user
+            user,
+            token
         })
 
         // capturar y manejar el error con catch

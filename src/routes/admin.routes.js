@@ -3,32 +3,32 @@ const express = require('express')
 const router = express.Router()
 const { check } = require('express-validator') // lo usaremos mas adelante para validar
 
-//2º Importar controllers (funciones CRUD)
-const { createHouse/*, getAllHouses, getHouseById, editHouseById, deleteHouseById, getAllReservas, editReservaById*/} = require("../controllers/admin.controller")
+// 2º Importar controllers (funciones CRUD)
+const { createHouse, getAllHouses, getHouseById, editHouseById, deleteHouseById/*, getAllReservas, editReservaById*/ } = require("../controllers/admin.controller")
 
-//3º Importar Middlewares validar JWT, validar rol y validar inputs
+// 3º Importar Middlewares
 const { validarJWT } = require("../middlewares/validarJWT");
 const { validarRol } = require("../middlewares/validarRol");
 const { validarInputs } = require("../middlewares/validarInputs");
-
-// const upload = require("../middlewares/multer.......");
+const { upload } = require("../middlewares/upload");
 
 //----------------GESTIÓN DE CASAS------------------
 
 //Panel principal admin donde ve todas las casas (GET)
-// router.get('/dashboard', [validarJWT, validarRol('admin')] , getAllHouses)
+router.get('/dashboard', [validarJWT, validarRol('admin')] , getAllHouses)
 
 //Vista detalle de una casa específica (GET)
-// router.get('/house/:id', [validarJWT, validarRol('admin')] , getHouseById)
+router.get('/house/:id', [validarJWT, validarRol('admin')] , getHouseById)
 
 //Añadir nueva casa (POST)
-router.post('/createHouse', [/*upload.single('imagen'),*/ validarJWT, validarRol('admin'), validarInputs] , createHouse)
+// imagenes es el nombre del campo que enviaremos desde el Front
+router.post('/createHouse', [validarJWT, validarRol('admin'), upload.array('imagenes', 10), validarInputs], createHouse)
 
-// //Editar una casa (PUT)
-// router.put('/editHouse/:id', [validarJWT, validarRol('admin'), validarInputs], editHouseById)
+// Editar una casa (PUT)
+router.put('/editHouse/:id', [validarJWT, validarRol('admin'), upload.array('imagenes', 10), validarInputs], editHouseById)
 
-// //Eliminar casa (DELETE)
-// router.delete('/deleteHouse/:id', [validarJWT, validarRol('admin')], deleteHouseById)
+// Eliminar casa (DELETE)
+router.delete('/deleteHouse/:id', [validarJWT, validarRol('admin')], deleteHouseById)
 
 
 // //-----------------GESTIÓN DE RESERVAS-----------------
