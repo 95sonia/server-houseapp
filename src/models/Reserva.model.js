@@ -44,7 +44,7 @@ const ReservaSchema = new Schema({
         default: 'pendiente'
     },
 }, {
-    timestamps: true // Esto nos dirá cuándo se hizo la reserva
+    timestamps: true // cuándo se hizo la reserva
 });
 
 // 3º exportar el modelo

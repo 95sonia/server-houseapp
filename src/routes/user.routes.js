@@ -6,11 +6,12 @@ const { check } = require('express-validator')
 // 2º Importar controllers
 const {
     getAllHouses,
-    // getHouseById,
-    // reservarHouse,
-    // addFavorito,
-    // verFavoritos,
-    // deleteFavorito,
+    getHouseById,
+    reservarHouse,
+    verReservas,
+    verFavoritos,
+    addFavorito,
+    deleteFavorito,
     // getPerfil,
     // updatePerfil,
 } = require("../controllers/user.controller");
@@ -22,27 +23,30 @@ const { validarRol } = require("../middlewares/validarRol");
 const { validarInputs } = require("../middlewares/validarInputs");
 
 // Ver panel principal con todas las casas y buscador (GET)
-router.get('/dashboard', [validarJWT], getAllHouses);
+router.get('/dashboard', [validarJWT, validarRol('user')], getAllHouses);
 
 // Ver detalles de una casa específica (GET)
-// router.get('/house/:id', [validarJWT], getHouseById);
+router.get('/house/:id', [validarJWT, validarRol('user')], getHouseById);
 
 //--------ACCIONES DE USUARIO (Requieren verificar Token) -------
 
 // Reservar una casa (POST)
-// router.post('/reservar',  [validarJWT, validarRol('user')], reservarHouse);
+router.post('/reservar/:id',  [validarJWT, validarRol('user')], reservarHouse);
+
+// Ver mis reservas realizadas (GET)
+router.get('/reservas', [validarJWT, validarRol('user')], verReservas);
 
 
 //--------GESTIÓN DE FAVORITOS -----------
 
-// Ver mis favoritos (GET)
-// router.get('/favoritos', [validarJWT, validarRol('user')], verFavoritos);
+// Ver todos mis favoritos (GET)
+router.get('/favoritos', [validarJWT, validarRol('user')], verFavoritos);
 
 // Añadir a favoritos (POST)
-// router.post('/favoritos/:id', [validarJWT, validarRol('user')], addFavorito);
+router.post('/favoritos/:id', [validarJWT, validarRol('user')], addFavorito);
 
 // Eliminar de favoritos (DELETE)
-// router.delete('/favoritos/:id', [validarJWT, validarRol('user')],  deleteFavorito);
+router.delete('/favoritos/:id', [validarJWT, validarRol('user')],  deleteFavorito);
 
 // Ver ofertas especiales (GET)
 // router.get('/ofertas', /* */);

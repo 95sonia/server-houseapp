@@ -1,5 +1,6 @@
 //1º Importar el modelo
 const House = require('../models/House.model');
+const User = require('../models/User.model');
 const Reserva = require('../models/Reserva.model');
 const { saveImage } = require('../middlewares/upload');
 const { cleanImages } = require('../helpers/cleanImages');
@@ -146,7 +147,7 @@ const editHouseById = async (req, res) => {
             });
         }
 
-        // LIMPIEZA: Usamos el helper para borrar lo que ya no sirve
+        // Usar helper para borrar lo que ya no sirve
         cleanImages(casaPrevia.imagenes, imagenesFinales);
 
         // Preparar objeto final para Mongoose 

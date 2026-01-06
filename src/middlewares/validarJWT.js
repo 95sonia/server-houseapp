@@ -25,15 +25,12 @@ const validarJWT = (req, res, next) => {
         const payload = jwt.verify(token, process.env.JWT_SECRET_KEY)
         // si la verificación es correcta Guardar el payload del token en el objeto req y llamar al metodo next()
         console.log(payload, 'payload de la funcion validarJWT')
-        const userToken = {
-            uid: payload.uid,
-            nombre: payload.nombre,
-            role: payload.role
-        }
-        // Inyectar los datos del usuario en la peticion (req)
-        req.userToken = userToken
-        //console.log(req)
 
+        // Inyectar los datos del usuario en la peticion (req)
+        req.uid = payload.uid;
+        req.nombre = payload.nombre;
+        req.role = payload.role;
+        
         next() // si token válido puede pasar a la ruta -> funcion de express para pasar al siguiente middleware o controlador
 
         // si la verificación no es correcta porque el token no coincide retornar una respuesta, status 401 Unathorized

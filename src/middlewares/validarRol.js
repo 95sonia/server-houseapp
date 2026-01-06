@@ -6,20 +6,16 @@
  */
 const validarRol = (...rolesPermitidos) => {
     return (req, res, next) => {
-        //Siempre verificar que el token se haya validado antes. Después extraer el rol del token
-        // El ?. evita que el servidor explote si req.userToken no existe
-        const rol = req.userToken?.role;
-
+        const rol = req.role;
         //Verificar si el rol del usuario está entre los permitidos
         if (!rolesPermitidos.includes(rol)) {
             return res.status(403).json({
                 ok: false,
-                msg: "No tienes permisos"
+                msg: "No tienes permisos para acceder"
             });
         }
         next();
     };
-
 }
 
 module.exports = { validarRol };
