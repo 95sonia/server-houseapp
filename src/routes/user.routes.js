@@ -4,44 +4,63 @@ const router = express.Router()
 const { check } = require('express-validator')
 
 // 2º Importar controllers
-// const { } = require("../controllers/");
-// const { } = require("../controllers/");
-// const { } = require("../controllers/");
-// const { } = require("../controllers/");
+const {
+    getAllHouses,
+    // getHouseById,
+    // reservarHouse,
+    // addFavorito,
+    // verFavoritos,
+    // deleteFavorito,
+    // getPerfil,
+    // updatePerfil,
+} = require("../controllers/user.controller");
+
 
 // 3º Importar Middlewares
-// const { verifyToken } = require("../middlewares/");
+const { validarJWT } = require("../middlewares/validarJWT");
+const { validarRol } = require("../middlewares/validarRol");
+const { validarInputs } = require("../middlewares/validarInputs");
 
 // Ver panel principal con todas las casas y buscador (GET)
-// router.get('/viviendas', /*  */);
+router.get('/dashboard', [validarJWT], getAllHouses);
 
-// // Ver detalles de una casa específica (GET)
-// router.get('/viviendas/:id', /* */);
+// Ver detalles de una casa específica (GET)
+// router.get('/house/:id', [validarJWT], getHouseById);
 
-// // Ver ofertas especiales (GET)
+//--------ACCIONES DE USUARIO (Requieren verificar Token) -------
+
+// Reservar una casa (POST)
+// router.post('/reservar',  [validarJWT, validarRol('user')], reservarHouse);
+
+
+//--------GESTIÓN DE FAVORITOS -----------
+
+// Ver mis favoritos (GET)
+// router.get('/favoritos', [validarJWT, validarRol('user')], verFavoritos);
+
+// Añadir a favoritos (POST)
+// router.post('/favoritos/:id', [validarJWT, validarRol('user')], addFavorito);
+
+// Eliminar de favoritos (DELETE)
+// router.delete('/favoritos/:id', [validarJWT, validarRol('user')],  deleteFavorito);
+
+// Ver ofertas especiales (GET)
 // router.get('/ofertas', /* */);
 
 
-// //--------ACCIONES DE USUARIO (Requieren verifyToken) ---
+// //--------PERFIL DE USUARIO ------------
 
-// // Reservar una casa (POST)
-// router.post('/reservar', /* [verifyToken],  */);
+//Ver mi perfil de usuario (GET)
+// router.get('/perfil', [validarJWT, validarRol('user')], getPerfil);
 
+// Modificar mis datos de usuario (PUT)
+// router.put('/perfil', [
+//     validarJWT, 
+//     check('nombre', 'El nombre es obligatorio').notEmpty(),
+//     check('email', 'Email no válido').isEmail(),
+//     validarRol('user'), 
+//     validarInputs
+// ], updatePerfil);
 
-// //--------GESTIÓN DE FAVORITOS ---
-
-// // Ver mis favoritos (GET)
-// router.get('/favoritos', /* [verifyToken],  */);
-
-// // Añadir a favoritos (POST)
-// router.post('/favoritos/:id', /* [verifyToken], */);
-
-// // Eliminar de favoritos (DELETE)
-// router.delete('/favoritos/:id', /* [verifyToken],  */);
-
-// //--------PERFIL DE USUARIO ---
-
-// // Modificar mis datos de usuario (PUT)
-// router.put('/perfil', /* [verifyToken], */);
 
 module.exports = router;

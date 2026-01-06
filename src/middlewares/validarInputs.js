@@ -17,14 +17,16 @@ const validarInputs = (req, res, next) => {
     console.log(errors)
     //console.log(errors.isEmpty())
     if (!errors.isEmpty()) {
+        // Convertimos el objeto de errores en un Array
+        const errorArray = errors.array();
         //si no es válido -> responder 400 = Bad request
-        //tengo que pasar al front esos errores con un endpoint -> el json es lo que recibe el front 
+        //tengo que pasar al front esos errores
         return res.status(400).json({
             ok: false,
-            errors: errors.mapped() // metodo mapped permite enviar errores como un objeto
+            msg: errorArray[0].msg // Envía el primer check que ha fallado al front. lo hago así porque con el objeto me daba problemas
         })
     } else {
-        next() // solo si la lista de errores está vacia, puedes pasar a la sig función
+        next() // solo si lista de errores está vacia pasar a la sig función
     }
 }
 

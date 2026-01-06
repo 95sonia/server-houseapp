@@ -4,7 +4,21 @@ const path = require("node:path");
 
 // Destino src/public/upload
 // __dirname aquí es src/middlewares, así q subimos un nivel con '..'
-const upload = multer({ dest: path.join(__dirname, '..', 'public', 'upload') });
+const upload = multer({
+    dest: path.join(__dirname, '..', 'public', 'upload'),
+    limits: {
+        files: 10, // limita nº de archivos que se pueden subir
+        //fileSize: 5 * 1024 * 1024 // limita tamaño: 5MB por foto, creo que es muy poco, no me coge la mayoria de fotos
+    },
+    fileFilter: (req, file, cb) => {
+        // Verificamos si el archivo es una img
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true); // Aceptar archivo
+        } else {
+            cb(new Error('Solo se permiten imágenes'), false); // Rechazar
+        }
+    }
+});
 
 // Función para renombrar la imagen a su nombre original
 const saveImage = (file) => {

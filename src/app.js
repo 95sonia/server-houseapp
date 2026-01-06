@@ -17,16 +17,15 @@ const port = process.env.PORT || 4001;
 
 // Middlewares
 app.use(cors({
-    origin: 'http://localhost:5173', // El puerto de Front - React
-    credentials: true  // Permite que viajen las cookies 
+    origin: ['http://localhost:5173', 'http://localhost:5174'], // El puerto de Front - React
+    credentials: true // Permite que viajen las cookies 
 })); // Para permitir peticiones desde el Frontend - React
 app.use(express.urlencoded({ extended: true })) // docu web de urlencoded npm. desde node para poder parsear el body necesitamos el componente bodyparser
 app.use(express.json()) // para recibir el body en formato JSON
 app.use(cookieParser());
 
-
 // --- CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS (para Multer) permite que las URLs de imagen sean accesibles
-app.use('/upload', express.static(path.join(__dirname, 'public', 'upload')));
+app.use('/upload', express.static(path.join(__dirname,'public', 'upload')));
 
 // Rutas (endpoints) Definir prefijo base para todas las rutas
 app.use('/api', require('./routes/auth.routes'))

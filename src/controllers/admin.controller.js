@@ -121,12 +121,16 @@ const editHouseById = async (req, res) => {
 
         //capturar datos básicos del body
         const dataActualizada = { ...req.body };
-
-        // Gestionar imágenes (Lógica de mezcla y guardado)
-        // Fots que se quedan ->  Mantenemos las que el usuario no borró en el front 
-        let imagenesFinales = req.body.imagenesExistentes || [];
-        // Aseguramos que sea un Array (por si llega una sola URL como string)
-        if (typeof imagenesFinales === 'string') imagenesFinales = [imagenesFinales];
+        
+        let imagenesFinales = [];
+        if (req.body.imagenesRestantes) {
+            try {
+                imagenesFinales = JSON.parse(req.body.imagenesRestantes);
+            } catch (e) {
+                // Por si acaso llega como string simple
+                imagenesFinales = [req.body.imagenesRestantes];
+            }
+        }
 
         //Fotos nuevas
         if (req.files && req.files.length > 0) {
