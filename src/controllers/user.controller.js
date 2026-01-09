@@ -1,14 +1,12 @@
 const User = require('../models/User.model');
-const House = require('../models/House.model')
+const House = require('../models/House.model');
 const Reserva = require('../models/Reserva.model');
 
-
-// VER TODAS LAS CASAS (USERDASHBOARD)
+// VER TODAS LAS CASAS (USERDASHBOARD y VISTA PÚBLICA)
 const getAllHouses = async (req, res) => {
     try {
         //1º Acceder a la BD con método find() de mongoose
         const houses = await House.find()
-
         // 2º Retornar respuesta exitosa (200 OK) y la data
         return res.status(200).json({
             ok: true,
@@ -113,7 +111,6 @@ const reservarHouse = async (req, res) => {
 
 
 // VER TODAS MIS RESERVAS
-
 const verReservas = async (req, res) => {
     try {
         const idUser = req.uid;
@@ -295,52 +292,72 @@ const deleteFavorito = async (req, res) => {
     }
 }
 
-
 // VER MI PERFIL DE USUARIO
-// const getPerfil = async (req, res) => {
-//     try {
-//         // coger ID del token (gracias al middleware validarJWT)
-//         // Buscar al usuario por su ID(hacer con algun metodo que NO traiga la contraseña)
+const getPerfil = async (req, res) => {
+    try {
+        //Coger ID del token (gracias al middleware validarJWT)
+        const idUser = req.uid;
+        console.log(idUser, 'es el idUser DESDE getPerfil-usercontrollers-------------')
+        //Buscar al usuario por su ID (hacer con algún método que NO traiga la contraseña)
+        const user = await User.findById(idUser).select('-password -role -reservas -favoritos -_id -__v')
+        console.log(user, 'es el user DESDE getPerfil-usercontrollers-------------')
+        //Comprobar si user no existe en BD -> 404
+        if (!user) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'El usuario no existe'
+            })
+        }
+        // Respuesta OK con los datos:
+        return res.status(200).json({
+            ok: true,
+            user
+        });
 
-//         // comprobar si user no eiste en BD -> 404
-
-//         // Respuesta OK con los datos:
-//         return res.status(200).json({
-//             ok: true,
-//             usuario
-//         });
-
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({
-//             ok: false,
-//             msg: 'Error interno del servidor al obtener los datos del perfil'
-//         })
-//     }
-// }
-
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al obtener los datos del perfil'
+        })
+    }
+}
 
 // MODIFICAR MIS DATOS PERFIL USUARIO
-// const updatePerfil = async (req, res) => {
-//      //coger los datos del body - formulario
-//     try {
-//         //Actualizar solo los campos permitidos (rol no se puede)
+const updatePerfil = async (req, res) => {
+    try {
+        //coger id de usuario
+        const idUser = req.uid;
+        //coger los campos del body formulario (desestructurar)
+        const { nombre, direccion, fechaNacimiento, telefono, email } = req.body;
+        //Almacenar el usuarioActualizado -> Método buscar y actualizar de mongoose. (OJO, si voy a mostrar el rol etc...actualizar solo datos permitidos)
+        const usuarioActualizado = await User.findByIdAndUpdate(idUser, { nombre, direccion, fechaNacimiento, telefono, email });
 
-//         //respuesta favorable
+        //Si no existe usuarioActualizado -> 404
+        if(!usuarioActualizado){
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            })
+        }
+        //respuesta favorable (OK 200) y devolver usuarioActualizado
+        return res.status(200).json({
+            ok: true,
+            msg: 'Perfil de usuario modificado correctamente',
+            user: usuarioActualizado
+        })
 
-
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({
-//             ok: false,
-//             msg: 'Error interno del servidor'
-//         })
-//     }
-// }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al intentar actualizar el perfil'
+        })
+    }
+}
 
 // VER OFERTAS ESPECIALES
 //Lo dejamos para el próximo sprint
-
 
 module.exports = {
     getAllHouses,
@@ -350,6 +367,6 @@ module.exports = {
     verFavoritos,
     addFavorito,
     deleteFavorito,
-    // getPerfil,
-    // updatePerfil,
+    getPerfil,
+    updatePerfil
 }

@@ -6,8 +6,22 @@ const UserSchema = new Schema({
     nombre: {
         type: String,
         required: true,
-        trim: true // Elimina espacios en blanco al ppio y al final
+        trim: true, // Elimina espacios en blanco al ppio y al final
+        lowercase: true
     },
+
+    direccion: {
+        type: String,
+        required: true,
+        lowercase: true
+    },
+
+    fechaNacimiento: {
+        type: Date,
+        required: true,
+        min: [18, 'Debe ser mayor de edad para poder registrarse']
+    },
+
     telefono: {
         type: String,
         required: true,

@@ -12,10 +12,9 @@ const {
     verFavoritos,
     addFavorito,
     deleteFavorito,
-    // getPerfil,
-    // updatePerfil,
+    getPerfil,
+    updatePerfil
 } = require("../controllers/user.controller");
-
 
 // 3º Importar Middlewares
 const { validarJWT } = require("../middlewares/validarJWT");
@@ -28,14 +27,11 @@ router.get('/dashboard', [validarJWT, validarRol('user')], getAllHouses);
 // Ver detalles de una casa específica (GET)
 router.get('/house/:id', [validarJWT, validarRol('user')], getHouseById);
 
-//--------ACCIONES DE USUARIO (Requieren verificar Token) -------
-
 // Reservar una casa (POST)
-router.post('/reservar/:id',  [validarJWT, validarRol('user')], reservarHouse);
+router.post('/reservar/:id', [validarJWT, validarRol('user')], reservarHouse);
 
 // Ver mis reservas realizadas (GET)
 router.get('/reservas', [validarJWT, validarRol('user')], verReservas);
-
 
 //--------GESTIÓN DE FAVORITOS -----------
 
@@ -46,25 +42,27 @@ router.get('/favoritos', [validarJWT, validarRol('user')], verFavoritos);
 router.post('/favoritos/:id', [validarJWT, validarRol('user')], addFavorito);
 
 // Eliminar de favoritos (DELETE)
-router.delete('/favoritos/:id', [validarJWT, validarRol('user')],  deleteFavorito);
+router.delete('/favoritos/:id', [validarJWT, validarRol('user')], deleteFavorito);
 
-// Ver ofertas especiales (GET)
-// router.get('/ofertas', /* */);
+// Ver ofertas especiales (GET) -> Para el próximo sprint
+//  router.get('/ofertas', /* */);
 
 
-// //--------PERFIL DE USUARIO ------------
+//--------PERFIL DE USUARIO ------------
 
 //Ver mi perfil de usuario (GET)
-// router.get('/perfil', [validarJWT, validarRol('user')], getPerfil);
+router.get('/perfil', [validarJWT, validarRol('user')], getPerfil);
 
 // Modificar mis datos de usuario (PUT)
-// router.put('/perfil', [
-//     validarJWT, 
-//     check('nombre', 'El nombre es obligatorio').notEmpty(),
-//     check('email', 'Email no válido').isEmail(),
-//     validarRol('user'), 
-//     validarInputs
-// ], updatePerfil);
-
+router.put('/perfil', [
+    validarJWT, 
+    check('nombre', 'El nombre es obligatorio').notEmpty(),
+    check('email', 'Email no válido').isEmail(),
+    check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').not().isEmpty().isLength({ min: 9, max: 9 }),
+    validarRol('user'), 
+    validarInputs
+], updatePerfil);    
 
 module.exports = router;
+
+

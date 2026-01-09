@@ -71,7 +71,7 @@ const getAllHouses = async (req, res) => {
     }
 }
 
-//VER UNA CASA (Detalle)
+//VER UNA CASA (Detalle) -> Veo que es la misma funcion que admin...se podría haber hecho solo una?
 const getHouseById = async (req, res) => {
 
     //extraer el id en los params del endPoint = URL
@@ -122,7 +122,7 @@ const editHouseById = async (req, res) => {
 
         //capturar datos básicos del body
         const dataActualizada = { ...req.body };
-        
+
         let imagenesFinales = [];
         if (req.body.imagenesRestantes) {
             try {
@@ -220,6 +220,10 @@ const deleteHouseById = async (req, res) => {
 
 //     } catch (error) {
 //         console.log(error)
+// return res.status(500).json({
+//     ok: false,
+//     msg: 'Error interno del servidor'
+// })
 //     }
 // }
 
@@ -231,6 +235,10 @@ const deleteHouseById = async (req, res) => {
 
 //     } catch (error) {
 //         console.log(error)
+// return res.status(500).json({
+//     ok: false,
+//     msg: 'Error interno del servidor'
+// })
 
 //     }
 // }

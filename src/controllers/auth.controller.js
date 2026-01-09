@@ -143,7 +143,7 @@ const loginUser = async (req, res) => {
 
 const renewToken = async (req, res) => {
     // recoger uid y el nombre del req
-    const { uid, nombre, role } = req.userToken;
+    const { uid, nombre, role } = req;
     console.log(uid, nombre, role, '-> mis datos desde renewtoken backend');
 
     // generar JWT y se retorna despues en la respuesta

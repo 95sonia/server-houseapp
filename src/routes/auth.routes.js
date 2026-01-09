@@ -5,14 +5,18 @@ const { check } = require('express-validator') // lo usaremos mas adelante para 
 
 //Importar controllers (funciones CRUD)
 const { createUser, loginUser, renewToken, logOut } = require("../controllers/auth.controller")
+const { getAllHouses, getHouseById } = require("../controllers/user.controller");
 
 //Importar middlewares validar JWT, validar rol y validar inputs
 const { validarJWT } = require("../middlewares/validarJWT")
 const { validarRol } = require("../middlewares/validarRol");
-const { validarInputs } = require("../middlewares/validarInputs")
+const { validarInputs } = require("../middlewares/validarInputs");
 
-//HOME Y BUSCADOR (GET) Vista inicio de la app  
-// router.get('/home');
+//HOME Vista inicio de la app  
+router.get('/home', getAllHouses);
+
+//HOME Vista detalle de una casa -> Importo la funcion de user porque es la misma vista en los 3 sitios (public, admin y user)
+router.get('/home/houseDetails', getHouseById)
 
 // //REGISTRO (POST) 
 router.post('/register', [

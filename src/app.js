@@ -28,9 +28,9 @@ app.use(cookieParser());
 app.use('/upload', express.static(path.join(__dirname,'public', 'upload')));
 
 // Rutas (endpoints) Definir prefijo base para todas las rutas
-app.use('/api', require('./routes/auth.routes'))
-app.use('/api/admin', require('./routes/admin.routes'))
-app.use('/api/user', require('./routes/user.routes'))
+app.use('/', require('./routes/auth.routes'))
+app.use('/admin', require('./routes/admin.routes'))
+app.use('/user', require('./routes/user.routes'))
 
 
 // Listener: Poner a la escucha ="levantar" el servidor. Se pone siempre al final del archivo
