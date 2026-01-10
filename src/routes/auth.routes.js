@@ -23,8 +23,29 @@ router.post('/register', [
     check('nombre')
         .toLowerCase()
         .notEmpty().withMessage('El nombre es obligatorio')
-        .isLength({ min: 2 }).withMessage('Debe tener al menos 2 caracteres')
+        .isLength({ min: 2 }).withMessage('El nombre debe tener al menos 2 caracteres')
         .matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('El nombre solo puede contener letras'),
+    check('direccion')
+        .notEmpty().withMessage('La dirección es obligatoria')
+        .isLength({ min: 5 }).withMessage('La dirección debe tener al menos 5 caracteres')
+        .matches(/[a-zA-Z]/).withMessage('La dirección debe contener letras, no solo números'),
+    check('fechaNacimiento')
+        .notEmpty().withMessage('La fecha de nacimiento es obliagtoria')
+        .isISO8601().withMessage('Solo es válido el formato fecha de nacimiento DD/MM/AAAA')
+        .custom((value) => { // funcion para que NO deje poner fechas de menores de 18 años
+            const fechaNacimiento = new Date(value);
+            const fechaHoy = new Date();
+            // Calcular la fecha límite (HOY - 18 años)-> obtener año, mes y dia de hace 18 años
+            const fechaLimite = new Date(
+                fechaHoy.getFullYear() - 18, //MÉTODOS del obj Date de JS. Devuelve año completo (2026) 
+                fechaHoy.getMonth(),  // Devuelve mes (0-11)
+                fechaHoy.getDate()  // Devuelve día del mes (1-31)
+            );
+            if (fechaNacimiento > fechaLimite) {
+                throw new Error('Debes ser mayor de 18 años para registrarte');
+            }
+            return true;
+        }),
     check('email', 'El email no es válido').isEmail().toLowerCase(),
     check('password', 'La contraseña debe tener al menos 6 caracteres').not().isEmpty().isLength({ min: 6 }),
     check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').not().isEmpty().isLength({ min: 9, max: 9 }),

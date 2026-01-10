@@ -7,8 +7,8 @@ const { JWTGenerator } = require('../helpers/jwt');
 const createUser = async (req, res) => {
     try {
         //capturar los elementos del formulario de registro
-        const { nombre, email, password, telefono } = req.body;
-        //console.log(nombre, email, password, telefono, 'datos body desde authcontroller backend');
+        const { nombre, direccion, fechaNacimiento, email, password, telefono } = req.body;
+        //console.log(nombre, email, direccion, nacimiento, telefono, 'datos body desde authcontroller backend');
 
         //hay que verificar si existe el user (para no duplicar), buscamos el email en BD
         const userExiste = await User.findOne({ email });
@@ -25,7 +25,7 @@ const createUser = async (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, salt);
 
         //Crear usuario = instancia
-        const newUser = { nombre, email, password: hashedPassword, telefono }
+        const newUser = { nombre, direccion, fechaNacimiento, email, password: hashedPassword, telefono }
         const user = new User(newUser);
 
         //guardamos usuario en BD con método save
@@ -113,6 +113,8 @@ const loginUser = async (req, res) => {
         //crear un objeto user para la respuesta
         const user = {
             nombre: usuarioBD.nombre,
+            direccion: usuarioBD.direccion,
+            fechaNacimiento: usuarioBD.fechaNacimiento,
             email: email,
             uid: usuarioBD._id,
             role: usuarioBD.role,      

@@ -25,11 +25,7 @@ const ReservaSchema = new Schema({
     numeroHuespedes: {
         type: Number,
         required: true,
-        min: [1, 'El número de huéspedes debe ser al menos 1'],
-        validate: {
-            validator: Number.isInteger,
-            message: 'El número de huéspedes debe ser un número entero (sin decimales).'
-        }
+        min: [1, 'El número de huéspedes debe ser al menos 1']
     },
 
     precioTotal: {

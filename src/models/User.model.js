@@ -18,8 +18,7 @@ const UserSchema = new Schema({
 
     fechaNacimiento: {
         type: Date,
-        required: true,
-        min: [18, 'Debe ser mayor de edad para poder registrarse']
+        required: true
     },
 
     telefono: {
@@ -43,11 +42,11 @@ const UserSchema = new Schema({
         enum: ['user', 'admin'], // Solo permite estos valores
         default: 'user'
     },
-    reservas: [{// Relación: Un usuario puede tener muchas reservas
+    reservas: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Reserva'
     }],
-    favoritos: [{// Relación: Un usuario guarda ids de viviendas que le gustan
+    favoritos: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'House' // Referencia al modelo de viviendas
     }]
