@@ -3,12 +3,12 @@ const { Schema, model, mongoose } = require('mongoose');
 
 // 2º crear el esquema
 const ReservaSchema = new Schema({
-    vivienda: {
-        type: mongoose.Schema.Types.ObjectId,
+    vivienda: { // Relacionamos la reserva con la casa asociada a la misma
+        type: mongoose.Schema.Types.ObjectId, // Se guarda como ID único de MongoDB
         ref: 'House',  // Debe coincidir con el nombre del modelo
         required: true
     },
-    usuario: {
+    usuario: { // Relacionamos la reserva con el usuario que la ha realizado
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', // Debe coincidir con el nombre del modelo
         required: true

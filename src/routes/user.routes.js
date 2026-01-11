@@ -39,7 +39,7 @@ router.post('/reservar/:id', [
             const fechaEntrada = new Date(value);
             const fechaHoy = new Date();
             fechaHoy.setHours(0, 0, 0, 0); // resetear a las 00:00h para comparar SOLO FECHAS y que deje reservar hoy (porque newDate guarda también la hora)
-            
+
             if (fechaEntrada < fechaHoy) {
                 throw new Error('Fecha de entrada no puede ser anterior a hoy');
             }
@@ -56,7 +56,7 @@ router.post('/reservar/:id', [
             }
             return true;
         }),
-    validarInputs
+    validarInputs // middleware que revisa si los checks anteriores dieron error
 ], reservarHouse);
 
 // Ver mis reservas realizadas (GET)
@@ -86,10 +86,35 @@ router.get('/perfil', [validarJWT, validarRol('user')], getPerfil);
 router.put('/perfil', [
     validarJWT,
     validarRol('user'),
-    check('nombre', 'El nombre es obligatorio').notEmpty(),
-    check('email', 'Email no válido').isEmail(),
-    check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').notEmpty().isLength({ min: 9, max: 9 }),
-    validarInputs
+    check('nombre')
+        .toLowerCase()
+        .notEmpty().withMessage('El nombre es obligatorio')
+        .isLength({ min: 2 }).withMessage('El nombre debe tener al menos 2 caracteres')
+        .matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('El nombre solo puede contener letras'),
+    check('direccion')
+        .notEmpty().withMessage('La dirección es obligatoria')
+        .isLength({ min: 5 }).withMessage('La dirección debe tener al menos 5 caracteres')
+        .matches(/[a-zA-Z]/).withMessage('La dirección debe contener letras, no solo números'),
+    check('fechaNacimiento')
+        .notEmpty().withMessage('La fecha de nacimiento es obliagtoria')
+        .isISO8601().withMessage('Solo es válido el formato fecha de nacimiento YYYY-MM-DD') // ISO 8601 = formato estándar internac para fechas = YYYY-MM-DD
+        .custom((value) => { // funcion para que NO deje poner fechas de menores de 18 años
+            const fechaNacimiento = new Date(value);
+            const fechaHoy = new Date();
+            // Calcular la fecha límite (HOY - 18 años)-> obtener año, mes y dia de hace 18 años
+            const fechaLimite = new Date(
+                fechaHoy.getFullYear() - 18, //MÉTODOS del obj Date de JS. Devuelve año completo (2026) 
+                fechaHoy.getMonth(),  // Devuelve mes (0-11)
+                fechaHoy.getDate()  // Devuelve día del mes (1-31)
+            );
+            if (fechaNacimiento > fechaLimite) {
+                throw new Error('Debes ser mayor de 18 años para registrarte');
+            }
+            return true;
+        }),
+    check('email', 'El email no es válido').isEmail().toLowerCase(),
+    check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').not().isEmpty().isLength({ min: 9, max: 9 }),
+    validarInputs // middleware que revisa si los checks anteriores dieron error
 ], updatePerfil);
 
 module.exports = router;

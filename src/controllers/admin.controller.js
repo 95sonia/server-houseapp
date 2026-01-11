@@ -120,7 +120,7 @@ const editHouseById = async (req, res) => {
             });
         }
 
-        //capturar datos básicos del body
+        //Capturar datos básicos del body
         const dataActualizada = { ...req.body };
 
         let imagenesFinales = [];
@@ -139,7 +139,7 @@ const editHouseById = async (req, res) => {
             const nuevasUrls = req.files.map(file => saveImage(file));
             imagenesFinales = [...imagenesFinales, ...nuevasUrls];
         }
-        // Si después de procesar todo, el array está vacío, lanzar error
+        //Si después de procesar todo, el array está vacío, lanzar error
         if (imagenesFinales.length === 0) {
             return res.status(400).json({
                 ok: false,
@@ -147,17 +147,17 @@ const editHouseById = async (req, res) => {
             });
         }
 
-        // Usar helper para borrar lo que ya no sirve
+        //Usar helper para borrar lo que ya no sirve
         cleanImages(casaPrevia.imagenes, imagenesFinales);
 
-        // Preparar objeto final para Mongoose 
+        //Preparar objeto final para Mongoose 
         dataActualizada.imagenes = imagenesFinales;
         dataActualizada.imagenPrincipal = imagenesFinales[0] || '';
 
-        // Actualizar en la BD, { new: true } sirve para que devuelva la casa ya modificada
+        //Actualizar en la BD, { new: true } sirve para que devuelva la casa ya modificada
         const houseActualizada = await House.findByIdAndUpdate(id, dataActualizada, { new: true });
 
-        // si existe responder (200 OK) y la data
+        //Si existe responder (200 OK) y la data
         return res.status(200).json({
             ok: true,
             msg: 'Vivienda actualizada correctamente',
@@ -191,10 +191,13 @@ const deleteHouseById = async (req, res) => {
             })
         }
 
-        //borrar todas las fotos del servidor con la función cleanImages (helper) enviando array vacío
+        //Borrar todas las fotos del servidor con la función cleanImages (helper) enviando array vacío
         cleanImages(house.imagenes, [])
 
-        // Borrar la casa de la base de datos con el método findByIdAndDelete() de mongoose
+        //Borrar todas las reservas asociadas a la vivienda (si no se quedan guardadas en la BD aunque la casa no exista!!)
+        await Reserva.deleteMany({ vivienda: id });
+
+        //Borrar la casa de la base de datos con el método findByIdAndDelete() de mongoose
         await House.findByIdAndDelete(id);
 
         // si existe responder (200 OK)
@@ -214,35 +217,92 @@ const deleteHouseById = async (req, res) => {
 
 
 // VER TODAS LAS RESERVAS
-// const getAllReservas = async (req, res) => {
-//     try {
+const getAllReservas = async (req, res) => {
+    try {
+        // Buscar todas las reservas
+        const reservas = await Reserva.find()
+            //Usar método .populate() para relacionar la reserva con usuario y casa
+            //sirve para unir datos de una colección con información de otra
+            .populate('usuario', 'nombre email telefono') // poblar el campo 'usuario' del modelo de reserva para ver sus datos
+            .populate('vivienda', 'titulo ubicacion descripcion estado') //poblar vivienda para ver sus datos
 
+        if (reservas.lenght === 0) {
+            return res.status(200).json({// 200 porque la consulta se ha realizado bien (aunque este vacío)
+                ok: true,
+                msg: 'Todavía no hay ninguna reserva realizada',
+            })
+        };
+        //respuesta favorable (200 OK) y devolver reservas
+        return res.status(200).json({
+            ok: true,
+            msg: 'Todas las reservas obtenidas correctamente',
+            reservas
+        });
 
-//     } catch (error) {
-//         console.log(error)
-// return res.status(500).json({
-//     ok: false,
-//     msg: 'Error interno del servidor'
-// })
-//     }
-// }
-
+        //gestionar error
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al obtener las reservas'
+        })
+    }
+}
 
 // MODIFICAR UNA RESERVA
-// const editReservaById = async (res, res) => {
-//     try {
+const editReservaById = async (req, res) => {
+    try {
+        const { id } = req.params; // id de la reserva llega desde la URL
+        //console.log(id, '--------id desde editarReserva admincontrollers------')
 
+        // Capturar datos del body - formulario front
+        const dataActualizada = req.body;
 
-//     } catch (error) {
-//         console.log(error)
-// return res.status(500).json({
-//     ok: false,
-//     msg: 'Error interno del servidor'
-// })
+        // Verificar si reserva existe
+        const reservaExiste = await Reserva.findById(id);
+        if (!reservaExiste) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No existe ninguna reserva con ese ID'
+            });
+        }
+        //Actualizar en la BD
+        const reservaActualizada = await Reserva.findByIdAndUpdate(
+            id,
+            dataActualizada,
+            {
+                new: true, // devuelve la reserva ya modificada
+                runValidators: true //revisa si los datos cumplen con las reglas del esquema (para no poder un estado que no sea 'pendiente', 'confirmada', 'cancelada')
+            })
+            .populate('usuario', 'nombre email') //poblar 'usuario' del modelo de reserva para ver sus datos (Por si los quiero mostrar en front)
+            .populate('vivienda', 'titulo');
 
-//     }
-// }
+        // SINCRONIZAR CON EL MODELO HOUSE para cambiar su estado !!
+        // Usar ID de la vivienda q está guardado en la reserva
+        const casaId = reservaActualizada.vivienda;
 
+        if (estado === 'confirmada') { // Si la reserva se confirma, la casa pasa a estar RESERVADA
+            await House.findByIdAndUpdate(casaId, { estado: 'reservada' });
+        }
+
+        if (estado === 'cancelada') { // Si la reserva se cancela, la casa estará DISPONIBLE
+            await House.findByIdAndUpdate(casaId, { estado: 'disponible' });
+        }
+        //Respuesta exitosa (200 OK) y la data
+        return res.status(200).json({
+            ok: true,
+            msg: 'Reserva actualizada correctamente',
+            data: reservaActualizada
+        })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al actualizar la reserva'
+        })
+    }
+}
 
 module.exports = {
     createHouse,
@@ -250,6 +310,6 @@ module.exports = {
     getHouseById,
     editHouseById,
     deleteHouseById,
-    // getAllReservas,
-    // editReservaById
+    getAllReservas,
+    editReservaById
 }

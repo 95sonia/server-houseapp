@@ -1,14 +1,16 @@
 // 1º importar express y router
-const express = require('express')
-const router = express.Router()
-const { check } = require('express-validator') // lo usaremos mas adelante para validar
+const express = require('express');
+const router = express.Router();
+const { check } = require('express-validator'); // lo usaremos mas adelante para validar
 
 // 2º Importar controllers (funciones CRUD)
 const { createHouse,
     getAllHouses,
     getHouseById,
     editHouseById,
-    deleteHouseById/*, getAllReservas,editReservaById*/
+    deleteHouseById,
+    getAllReservas,
+    editReservaById
 } = require("../controllers/admin.controller")
 
 // 3º Importar Middlewares
@@ -55,16 +57,20 @@ router.put('/editHouse/:id', [
 // Eliminar casa (DELETE)
 router.delete('/deleteHouse/:id', [validarJWT, validarRol('admin')], deleteHouseById)
 
-// //-----------------GESTIÓN DE RESERVAS-----------------
+//------------------GESTIÓN DE RESERVAS------------------
 
-// //Ver todas las reservas (GET)
-// router.get('/reservas' , [validarJWT, validarRol('admin')], getAllReservas)
+// Ver todas las reservas (GET)
+router.get('/reservas', [validarJWT, validarRol('admin')], getAllReservas)
 
-// //Editar una reserva (PUT)
-// router.put('/reservas/:id', [validarJWT, validarRol('admin'), validarInputs], editReservaById)
+// Editar una reserva (PUT)
+router.put('/reservas/:id', [
+    validarJWT,
+    validarRol('admin'),
+    validarInputs
+], editReservaById)
 
 
-// //-----------PANEL DE GESTIÓN DE USUARIOS--------------
+//-------------PANEL DE GESTIÓN DE USUARIOS--------------
 
 // //VER LISTADO TODOS LOS USUARIOS (GET)
 // router.get('/users'/*, [validarJWT, validarRol('admin')] , controlador*/);

@@ -31,7 +31,7 @@ router.post('/register', [
         .matches(/[a-zA-Z]/).withMessage('La dirección debe contener letras, no solo números'),
     check('fechaNacimiento')
         .notEmpty().withMessage('La fecha de nacimiento es obliagtoria')
-        .isISO8601().withMessage('Solo es válido el formato fecha de nacimiento DD/MM/AAAA')
+        .isISO8601().withMessage('Solo es válido el formato fecha de nacimiento YYYY-MM-DD') // ISO 8601 = formato estándar internac para fechas = YYYY-MM-DD
         .custom((value) => { // funcion para que NO deje poner fechas de menores de 18 años
             const fechaNacimiento = new Date(value);
             const fechaHoy = new Date();

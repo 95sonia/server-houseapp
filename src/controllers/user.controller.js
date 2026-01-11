@@ -114,9 +114,9 @@ const reservarHouse = async (req, res) => {
 const verReservas = async (req, res) => {
     try {
         const idUser = req.uid;
-
         // Busca  reservas de este usuario
-        const reservas = await Reserva.find({ usuario: idUser });
+        const reservas = await Reserva.find({ usuario: idUser })
+            .populate('vivienda', 'titulo ubicacion'); // _id siempre se incluye por defecto, no hace falta pedirlo
 
         // Si no tiene reservas, parar aquí
         if (reservas.length === 0) {
@@ -126,23 +126,11 @@ const verReservas = async (req, res) => {
                 data: []
             });
         }
-
-        // Extraer todos los IDs de viviendas que usuario ha reservado
-        const idsViviendas = reservas.map(reserva => reserva.vivienda);
-
-        //Buscar info de esas casas (como en favoritos)
-        // Buscar en la coleccion House qué casas coinciden con los ids que tengo '$in' reservas
-        // $in -> operador de consulta dentro de los métodos de MongoDB
-        const casasInfo = await House.find({ _id: { $in: idsViviendas } });
-
         // Devolver reservas y info de las casas
         return res.status(200).json({
             ok: true,
-            msg: 'Reservas recuperadas',
-            data: {
-                reservas,
-                casasInfo // Aquí el Front podrá sacar título y URL de imagen
-            }
+            msg: 'Reservas obtenidas correctamente',
+            data: reservas,
         });
 
     } catch (error) {
@@ -334,7 +322,7 @@ const updatePerfil = async (req, res) => {
         const usuarioActualizado = await User.findByIdAndUpdate(idUser, { nombre, direccion, fechaNacimiento, telefono, email });
 
         //Si no existe usuarioActualizado -> 404
-        if(!usuarioActualizado){
+        if (!usuarioActualizado) {
             return res.status(404).json({
                 ok: false,
                 msg: 'Usuario no encontrado'
