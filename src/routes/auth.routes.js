@@ -5,7 +5,7 @@ const { check } = require('express-validator') // lo usaremos mas adelante para 
 
 //Importar controllers (funciones CRUD)
 const { createUser, loginUser, renewToken, logOut } = require("../controllers/auth.controller")
-const { getAllHouses, getHouseById } = require("../controllers/user.controller");
+const { getAllHouses, getHouseById } = require("../controllers/user.controller.js");
 
 //Importar middlewares validar JWT, validar rol y validar inputs
 const { validarJWT } = require("../middlewares/validarJWT")
