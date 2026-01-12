@@ -16,10 +16,33 @@ dbConnect();
 const port = process.env.PORT || 4001;
 
 // Middlewares
+// app.use(cors({
+//     origin: ['http://localhost:5173', 'http://localhost:5174', 'https://client-houseapp.vercel.app'], // El puerto de Front - React
+//     credentials: true // Permite que viajen las cookies 
+// })); // Para permitir peticiones desde el Frontend - React
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://client-houseapp.vercel.app"
+];
+
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://client-houseapp.vercel.app'], // El puerto de Front - React
-    credentials: true // Permite que viajen las cookies 
-})); // Para permitir peticiones desde el Frontend - React
+  origin: function (origin, callback) {
+    // Si no viene origin (Postman, tests), permitir
+    if (!origin) return callback(null, true);
+
+    // Comprobar si está en la lista
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("No permitido por CORS"));
+    }
+  },
+  credentials: true
+}));
+
+
 app.use(express.urlencoded({ extended: true })) // docu web de urlencoded npm. desde node para poder parsear el body necesitamos el componente bodyparser
 app.use(express.json()) // para recibir el body en formato JSON
 app.use(cookieParser());
