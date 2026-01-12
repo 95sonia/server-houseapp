@@ -161,7 +161,7 @@ const verFavoritos = async (req, res) => {
         }
         //Si no tiene nada en favoritos
         if (usuario.favoritos.length === 0) {
-            return res.status(400).json({
+            return res.status(200).json({//solicitud correcta pero no hay nada en favs
                 ok: false,
                 msg: 'No hay nada en favoritos'
             });

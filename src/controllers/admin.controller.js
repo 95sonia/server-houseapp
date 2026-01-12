@@ -254,9 +254,8 @@ const editReservaById = async (req, res) => {
     try {
         const { id } = req.params; // id de la reserva llega desde la URL
         //console.log(id, '--------id desde editarReserva admincontrollers------')
-
-        // Capturar datos del body - formulario front
-        const dataActualizada = req.body;
+         // Capturar datos del body - formulario front, en este caso solo puede cambiar el estado...ya lo iremos ampliando
+        const { estado } = req.body; //capturar el estado de la reserva que lo envia el ADMIN desde su panel
 
         // Verificar si reserva existe
         const reservaExiste = await Reserva.findById(id);
@@ -269,7 +268,7 @@ const editReservaById = async (req, res) => {
         //Actualizar en la BD
         const reservaActualizada = await Reserva.findByIdAndUpdate(
             id,
-            dataActualizada,
+            { estado }, // actualizar el estado que viene del front, lo ha cambiado el admin desde su panel
             {
                 new: true, // devuelve la reserva ya modificada
                 runValidators: true //revisa si los datos cumplen con las reglas del esquema (para no poder un estado que no sea 'pendiente', 'confirmada', 'cancelada')
@@ -285,7 +284,7 @@ const editReservaById = async (req, res) => {
             await House.findByIdAndUpdate(casaId, { estado: 'reservada' });
         }
 
-        if (estado === 'cancelada') { // Si la reserva se cancela, la casa estará DISPONIBLE
+        if (estado === 'cancelada' || estado === 'pendiente') { // Si la reserva se cancela o esta pendiente otra vez, la casa estará DISPONIBLE
             await House.findByIdAndUpdate(casaId, { estado: 'disponible' });
         }
         //Respuesta exitosa (200 OK) y la data

@@ -16,7 +16,7 @@ const { validarInputs } = require("../middlewares/validarInputs");
 router.get('/home', getAllHouses);
 
 //HOME Vista detalle de una casa -> Importo la funcion de user porque es la misma vista en los 3 sitios (public, admin y user)
-router.get('/home/houseDetails', getHouseById)
+router.get('/home/house/:id', getHouseById)
 
 // //REGISTRO (POST) 
 router.post('/register', [
