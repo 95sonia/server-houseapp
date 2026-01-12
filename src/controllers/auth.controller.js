@@ -46,7 +46,7 @@ const createUser = async (req, res) => {
             httpOnly: true,
             maxAge: 3600000, // 1 hora
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Lax'
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
         });
 
         //Respuesta favorable
@@ -107,7 +107,7 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             maxAge: 3600000, // 1 hora
             secure: process.env.NODE_ENV === 'production', // Si el entorno es producción, secure = true; si no pon false
-            sameSite: 'Lax'
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
         });
 
         //crear un objeto user para la respuesta
@@ -157,7 +157,7 @@ const renewToken = async (req, res) => {
         httpOnly: true,
         maxAge: 3600000,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Lax'
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
     });
 
     //retornar status
