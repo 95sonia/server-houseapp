@@ -32,8 +32,7 @@ Un aspecto fundamental del modelo `House` en Mongoose es el campo `imagenPrincpa
    cd server-houseapp
 
 2. **Instalación de dependencias:**
-
-```bash
+    ```bash
 npm install
 
 3. **Variables de Entorno: Crea un archivo .env en la raíz del proyecto con la siguiente configuración (copia las variables del .env.templates y rellénalas con tus claves):**
@@ -44,6 +43,6 @@ JWT_SECRET=tu_clave_secreta_para_tokens
 VITE_API_URL_BASE=[https://server-houseapp.onrender.com](https://server-houseapp.onrender.com)
 
 4. **Ejecución del servidor:**
-```bash
+    ```bash
 npm start # O npm run dev para modo desarrollo con nodemon
 
