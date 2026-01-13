@@ -17,7 +17,7 @@ Este es el servidor de **HouseApp**, una aplicación de gestión de alquileres v
 * **Dotenv**: Gestión de variables de entorno.
 * **Cors**: Configuración de seguridad para el acceso desde el frontend.
 
-## 📸 Gestión de Imágenes
+## Gestión de Imágenes
 
 Un aspecto fundamental del modelo `House` en Mongoose es el campo `imagenPrincpal` y el array `imagenes`:
 - **Lógica**: No almacena datos binarios pesados en la base de datos; lo que se guarda es la **dirección web (URL)** de la imagen.
@@ -33,7 +33,7 @@ Un aspecto fundamental del modelo `House` en Mongoose es el campo `imagenPrincpa
 
 2. **Instalación de dependencias:**
 
-´´´bash
+```bash
 npm install
 
 3. **Variables de Entorno: Crea un archivo .env en la raíz del proyecto con la siguiente configuración (copia las variables del .env.templates y rellénalas con tus claves):**
@@ -43,7 +43,7 @@ MONGO_URI=tu_cadena_de_conexion_mongodb
 JWT_SECRET=tu_clave_secreta_para_tokens
 VITE_API_URL_BASE=[https://server-houseapp.onrender.com](https://server-houseapp.onrender.com)
 
-3. **Ejecución del servidor:**
-´´´bash
+4. **Ejecución del servidor:**
+```bash
 npm start # O npm run dev para modo desarrollo con nodemon
 
