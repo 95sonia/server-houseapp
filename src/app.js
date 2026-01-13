@@ -5,6 +5,9 @@ const path = require('path'); // para utilizarlo abajo, en la carpeta upload
 const cookieParser = require('cookie-parser');
 require('dotenv').config() // para poder usar variables de entorno (ver docu npm)
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger.json');
+
 const dbConnect = require('./config/dbConnect');
 
 const app = express() // hacer uso de express
@@ -49,6 +52,8 @@ app.use(cookieParser());
 
 // --- CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS (para Multer) permite que las URLs de imagen sean accesibles
 app.use('/upload', express.static(path.join(__dirname,'public', 'upload')));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // configuracion de swagger (se pone antes de las rutas)
 
 // Rutas (endpoints) Definir prefijo base para todas las rutas
 app.use('/', require('./routes/auth.routes'))

@@ -23,7 +23,6 @@ const JWTGenerator = (payload) => {
             }
         )
     })
-
 }
 
 module.exports = { JWTGenerator }

@@ -1,0 +1,742 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API de Alquiler de Casas",
+    "version": "1.0.0",
+    "description": "Documentación completa de la API de alquiler de casas, con rutas de administración, usuario y autenticación."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4001",
+      "description": "Servidor local"
+    }
+  ],
+  "tags": [
+    { "name": "Auth", "description": "Rutas de autenticación y gestión de sesión" },
+    { "name": "User", "description": "Rutas para usuarios normales" },
+    { "name": "Admin", "description": "Rutas para administradores" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "641d28ab1234567890abcdef" },
+          "nombre": { "type": "string", "example": "sofia" },
+          "direccion": { "type": "string", "example": "Calle Falsa 123" },
+          "fechaNacimiento": { "type": "string", "format": "date", "example": "1990-05-15" },
+          "telefono": { "type": "string", "example": "123456789" },
+          "email": { "type": "string", "format": "email", "example": "sofia@mail.com" },
+          "role": { "type": "string", "example": "user" },
+          "reservas": {
+            "type": "array",
+            "items": { "type": "string", "example": "641d28ab1234567890abcdea" }
+          },
+          "favoritos": {
+            "type": "array",
+            "items": { "type": "string", "example": "641d28ab1234567890abcdeb" }
+          }
+        },
+        "required": ["nombre", "direccion", "fechaNacimiento", "telefono", "email", "role"]
+      },
+      "House": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "641d28ab1234567890abcdec" },
+          "titulo": { "type": "string", "example": "Casa en la playa" },
+          "ubicacion": { "type": "string", "example": "Barcelona" },
+          "precioNoche": { "type": "number", "example": 80 },
+          "imagenPrincipal": { "type": "string", "format": "uri", "example": "http://localhost:4001/upload/casa1.jpg" },
+          "imagenes": {
+            "type": "array",
+            "items": { "type": "string", "format": "uri" }
+          },
+          "descripcion": { "type": "string", "example": "Casa hermosa con vista al mar." },
+          "estado": { "type": "string", "enum": ["disponible", "reservada"], "example": "disponible" }
+        },
+        "required": ["titulo", "ubicacion", "precioNoche", "imagenPrincipal", "imagenes", "descripcion"]
+      },
+      "Reserva": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "641d28ab1234567890abcdee" },
+          "vivienda": { "type": "string", "example": "641d28ab1234567890abcdec" },
+          "usuario": { "type": "string", "example": "641d28ab1234567890abcdef" },
+          "fechaEntrada": { "type": "string", "format": "date", "example": "2026-02-01" },
+          "fechaSalida": { "type": "string", "format": "date", "example": "2026-02-07" },
+          "numeroHuespedes": { "type": "integer", "example": 4 },
+          "precioTotal": { "type": "number", "example": 480 },
+          "estado": { "type": "string", "enum": ["pendiente", "confirmada", "cancelada"], "example": "pendiente" }
+        },
+        "required": ["vivienda", "usuario", "fechaEntrada", "fechaSalida", "numeroHuespedes", "precioTotal"]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password" }
+        },
+        "required": ["email", "password"]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "nombre": { "type": "string" },
+          "direccion": { "type": "string" },
+          "fechaNacimiento": { "type": "string", "format": "date" },
+          "telefono": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password" }
+        },
+        "required": ["nombre", "direccion", "fechaNacimiento", "telefono", "email", "password"]
+      },
+      "CreateHouseRequest": {
+        "type": "object",
+        "properties": {
+          "titulo": { "type": "string" },
+          "ubicacion": { "type": "string" },
+          "precioNoche": { "type": "number" },
+          "descripcion": { "type": "string" }
+        },
+        "required": ["titulo", "ubicacion", "precioNoche", "descripcion"]
+      },
+      "EditHouseRequest": {
+        "type": "object",
+        "properties": {
+          "titulo": { "type": "string" },
+          "ubicacion": { "type": "string" },
+          "precioNoche": { "type": "number" },
+          "descripcion": { "type": "string" }
+        },
+        "required": ["titulo", "ubicacion", "precioNoche", "descripcion"]
+      },
+      "ReservaRequest": {
+        "type": "object",
+        "properties": {
+          "numeroHuespedes": { "type": "integer" },
+          "fechaEntrada": { "type": "string", "format": "date" },
+          "fechaSalida": { "type": "string", "format": "date" }
+        },
+        "required": ["numeroHuespedes", "fechaEntrada", "fechaSalida"]
+      },
+      "EditReservaRequest": {
+        "type": "object",
+        "properties": {
+          "estado": {
+            "type": "string",
+            "enum": ["pendiente", "confirmada", "cancelada"]
+          }
+        },
+        "required": ["estado"]
+      },
+      "EditUserRequest": {
+        "type": "object",
+        "properties": {
+          "nombre": { "type": "string" },
+          "direccion": { "type": "string" },
+          "fechaNacimiento": { "type": "string", "format": "date" },
+          "telefono": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        },
+        "required": ["nombre", "direccion", "fechaNacimiento", "telefono", "email"]
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Registrar nuevo usuario",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado correctamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "400": { "description": "Error en datos enviados" }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login de usuario",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso, token enviado en cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean", "example": true },
+                    "uid": { "type": "string", "example": "641d28ab1234567890abcdef" },
+                    "name": { "type": "string", "example": "sofia" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Datos inválidos" },
+          "401": { "description": "Email o contraseña incorrectos" }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Cerrar sesión",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Logout exitoso" },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/renew": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Renovar token",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Token renovado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/home": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Lista todas las casas (vista pública)",
+        "responses": {
+          "200": {
+            "description": "Lista de casas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/House" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/home/house/{id}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Detalles de una casa pública",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la casa",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de casa",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/House" } }
+            }
+          },
+          "404": { "description": "Casa no encontrada" }
+        }
+      }
+    },
+    "/user/dashboard": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Panel principal usuario",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista casas para usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/House" }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/user/house/{id}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Detalles de una casa para usuario",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la casa",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de casa",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/House" } }
+            }
+          },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Casa no encontrada" }
+        }
+      }
+    },
+    "/user/reservar/{id}": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Reservar casa",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la casa a reservar",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReservaRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Reserva creada" },
+          "400": { "description": "Error en datos" },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/user/reservas": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Ver mis reservas",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de reservas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Reserva" }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/user/favoritos": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Ver favoritos",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de favoritos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/House" }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/user/favoritos/{id}": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Añadir a favoritos",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de casa para añadir",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Añadido a favoritos" },
+          "401": { "description": "No autorizado" }
+        }
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Eliminar de favoritos",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de casa para eliminar",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Eliminado de favoritos" },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/user/perfil": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Ver perfil usuario",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Datos del perfil",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Actualizar perfil usuario",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EditUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Perfil actualizado" },
+          "400": { "description": "Error en datos" },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/admin/dashboard": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Panel principal admin (todas casas)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista casas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/House" }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/admin/house/{id}": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Detalle casa admin",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de casa",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle casa",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/House" } }
+            }
+          },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Casa no encontrada" }
+        }
+      }
+    },
+    "/admin/createHouse": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Crear casa",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateHouseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Casa creada" },
+          "400": { "description": "Error en datos" },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/admin/editHouse/{id}": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Editar casa",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de casa",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EditHouseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Casa actualizada" },
+          "400": { "description": "Error en datos" },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Casa no encontrada" }
+        }
+      }
+    },
+    "/admin/deleteHouse/{id}": {
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Eliminar casa",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de casa",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Casa eliminada" },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Casa no encontrada" }
+        }
+      }
+    },
+    "/admin/reservas": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Ver todas las reservas",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista reservas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Reserva" }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/admin/reservas/{id}": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Actualizar estado de reserva",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de reserva",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EditReservaRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Reserva actualizada" },
+          "400": { "description": "Error en datos" },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Reserva no encontrada" }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Ver todos los usuarios",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista usuarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" }
+        }
+      }
+    },
+    "/admin/users/{id}": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Ver usuario por ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID usuario",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos usuario",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+          },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Usuario no encontrado" }
+        }
+      },
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Actualizar usuario por ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID usuario",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EditUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Usuario actualizado" },
+          "400": { "description": "Error en datos" },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Usuario no encontrado" }
+        }
+      },
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Eliminar usuario por ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID usuario",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Usuario eliminado" },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Usuario no encontrado" }
+        }
+      }
+    }
+  }
+}

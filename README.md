@@ -46,3 +46,34 @@ VITE_API_URL_BASE=[https://server-houseapp.onrender.com](https://server-houseapp
     ```bash
 npm start # O npm run dev para modo desarrollo con nodemon
 
+## Uso
+
+- Una vez el servidor esté corriendo, la API estará disponible en el puerto configurado (por defecto 4001).
+- Puedes acceder a la documentación Swagger en:  
+  `http://localhost:4001/api-docs`  
+  donde encontrarás todos los endpoints disponibles con sus descripciones, parámetros y ejemplos.
+
+## Endpoints Principales
+
+- `/auth`  
+  Registro, login, renovación de token y logout de usuarios.
+
+- `/admin`  
+  Gestión completa de viviendas, reservas y usuarios (requiere rol administrador).
+
+- `/user`  
+  Visualización de viviendas, gestión de reservas propias, favoritos y perfil (requiere autenticación).
+
+## Estructura de carpetas
+
+/src
+/config # Configuraciones generales (DB, variables de entorno)
+/controllers # Lógica de negocio y controladores por entidad
+/middlewares # Middlewares para validaciones, autenticación y carga de archivos
+/models # Esquemas de Mongoose para User, House y Reserva
+/routes # Definición de rutas agrupadas por funcionalidad
+/public/upload # Almacenamiento de imágenes subidas
+/src/app.js # Punto de entrada principal del servidor
+
+
+Desarrollado por Sonia N.M. (Enero 2026)

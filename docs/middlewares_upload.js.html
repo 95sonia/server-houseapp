@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: middlewares/upload.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: middlewares/upload.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const multer = require("multer");
+const fs = require("node:fs");
+const path = require("node:path");
+
+/**
+ * Configuración del middleware Multer para la gestión de subida de archivos.
+ * Define el destino en 'public/upload', limita la cantidad de archivos a 10
+ * y filtra para asegurar que solo se procesen tipos de archivo de imagen.
+ * * @constant {Object} upload
+ */
+const upload = multer({
+    dest: path.join(__dirname, '..', 'public', 'upload'), // __dirname aquí es src/middlewares, así q subimos un nivel con '..'
+    limits: {
+        files: 10, // limita nº de archivos que se pueden subir
+        //fileSize: 5 * 1024 * 1024 // limita tamaño: 5MB por foto, creo que es muy poco, no me coge la mayoria de fotos
+    },
+    fileFilter: (req, file, cb) => {
+        // Verificamos si el archivo es una img
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true); // Aceptar archivo
+        } else {
+            cb(new Error('Solo se permiten imágenes'), false); // Rechazar
+        }
+    }
+});
+
+
+/**
+ * Procesa un archivo subido mediante Multer, moviéndolo de la carpeta temporal 
+ * a la ubicación definitiva en el servidor y generando su URL pública.
+ * * @function saveImage
+ * @param {Object} file - Objeto del archivo proporcionado por el middleware Multer.
+ * @param {string} file.originalname - Nombre original del archivo subido.
+ * @param {string} file.path - Ruta temporal donde Multer almacenó el archivo inicialmente.
+ * @returns {string} La URL completa (ej. http://localhost:4000/upload/imagen.jpg) para almacenar en el campo `representativeImage` de Mongoose.
+ * * @description
+ * 1. Extrae el nombre original del archivo.
+ * 2. Define la ruta de destino final en el sistema de archivos (src/public/upload).
+ * 3. Utiliza `fs.renameSync` para mover el archivo desde la ruta temporal de Multer a la final.
+ * 4. Retorna la dirección web basada en la variable de entorno `URL_BASE`.
+ */
+const saveImage = (file) => {
+
+    const fileName = file.originalname;   // Crear nombre de archivo final: fecha actual + nombre original (para evitar que no se suba la img o que se sobreescriba si ya existe ese nombre)
+    const newPath = path.join(__dirname, '..', 'public', 'upload', fileName);   // Definir ruta completa: src/public/upload/archivo.jpg
+    fs.renameSync(file.path, newPath);  // Renombra archivo temporal de multer al nuevo nombre con fecha
+    return `${process.env.URL_BASE}/upload/${fileName}`;  // Retornar URL que se guarda en Mongoose como String 
+};
+
+module.exports = {
+    upload,
+    saveImage
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#JWTGenerator">JWTGenerator</a></li><li><a href="global.html#addFavorito">addFavorito</a></li><li><a href="global.html#cleanImages">cleanImages</a></li><li><a href="global.html#createHouse">createHouse</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#dbConnect">dbConnect</a></li><li><a href="global.html#deleteFavorito">deleteFavorito</a></li><li><a href="global.html#deleteHouseById">deleteHouseById</a></li><li><a href="global.html#deleteUserById">deleteUserById</a></li><li><a href="global.html#editHouseById">editHouseById</a></li><li><a href="global.html#editReservaById">editReservaById</a></li><li><a href="global.html#editUserById">editUserById</a></li><li><a href="global.html#getAllHouses">getAllHouses</a></li><li><a href="global.html#getAllReservas">getAllReservas</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getHouseById">getHouseById</a></li><li><a href="global.html#getPerfil">getPerfil</a></li><li><a href="global.html#getUserById">getUserById</a></li><li><a href="global.html#logOut">logOut</a></li><li><a href="global.html#loginUser">loginUser</a></li><li><a href="global.html#renewToken">renewToken</a></li><li><a href="global.html#reservarHouse">reservarHouse</a></li><li><a href="global.html#saveImage">saveImage</a></li><li><a href="global.html#updatePerfil">updatePerfil</a></li><li><a href="global.html#upload">upload</a></li><li><a href="global.html#validarInputs">validarInputs</a></li><li><a href="global.html#validarJWT">validarJWT</a></li><li><a href="global.html#validarRol">validarRol</a></li><li><a href="global.html#verFavoritos">verFavoritos</a></li><li><a href="global.html#verReservas">verReservas</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Jan 13 2026 12:47:17 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

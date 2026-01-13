@@ -20,7 +20,7 @@ const validarJWT = (req, res, next) => {
             msg: 'No hay token en la petición'
         })
     }
-    // Si lo hay verificar el token (metodo verify del paquete jsonwebtoken)
+    // Si lo hay verificar el token (metodo verify de jwt)
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET_KEY)
         // si la verificación es correcta Guardar el payload del token en el objeto req y llamar al metodo next()
