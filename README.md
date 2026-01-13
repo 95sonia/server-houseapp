@@ -33,18 +33,18 @@ Un aspecto fundamental del modelo `House` en Mongoose es el campo `imagenPrincpa
 
 2. **Instalación de dependencias:**
     ```bash
-npm install
+    npm install
 
 3. **Variables de Entorno: Crea un archivo .env en la raíz del proyecto con la siguiente configuración (copia las variables del .env.templates y rellénalas con tus claves):**
    ```bash
-PORT=4000
-MONGO_URI=tu_cadena_de_conexion_mongodb
-JWT_SECRET=tu_clave_secreta_para_tokens
-VITE_API_URL_BASE=[https://server-houseapp.onrender.com](https://server-houseapp.onrender.com)
+    PORT=4000
+    MONGO_URI=tu_cadena_de_conexion_mongodb
+    JWT_SECRET=tu_clave_secreta_para_tokens
+    VITE_API_URL_BASE=[https://server-houseapp.onrender.com](https://server-houseapp.onrender.com)
 
 4. **Ejecución del servidor:**
     ```bash
-npm start # O npm run dev para modo desarrollo con nodemon
+    npm start # O npm run dev para modo desarrollo con nodemon
 
 ## Uso
 
@@ -65,15 +65,15 @@ npm start # O npm run dev para modo desarrollo con nodemon
   Visualización de viviendas, gestión de reservas propias, favoritos y perfil (requiere autenticación).
 
 ## Estructura de carpetas
-
-/src
-/config # Configuraciones generales (DB, variables de entorno)
-/controllers # Lógica de negocio y controladores por entidad
-/middlewares # Middlewares para validaciones, autenticación y carga de archivos
-/models # Esquemas de Mongoose para User, House y Reserva
-/routes # Definición de rutas agrupadas por funcionalidad
-/public/upload # Almacenamiento de imágenes subidas
-/src/app.js # Punto de entrada principal del servidor
+    ```bash
+    /src
+    /config # Configuraciones generales (DB, variables de entorno).
+    /controllers # Lógica de negocio y controladores por entidad.
+    /middlewares # Middlewares para validaciones, autenticación y carga de archivos.
+    /models # Esquemas de Mongoose para User, House y Reserva.
+    /routes # Definición de rutas agrupadas por funcionalidad.
+    /public/upload # Almacenamiento de imágenes subidas.
+    /src/app.js # Punto de entrada principal del servidor.
 
 
 Desarrollado por Sonia N.M. (Enero 2026)
