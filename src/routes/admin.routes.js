@@ -10,7 +10,8 @@ const { createHouse,
     editHouseById,
     deleteHouseById,
     getAllReservas,
-    editReservaById
+    editReservaById,
+    getAllUsers
 } = require("../controllers/admin.controller")
 
 // 3º Importar Middlewares
@@ -69,11 +70,10 @@ router.put('/reservas/:id', [
     validarInputs
 ], editReservaById)
 
-
 //-------------PANEL DE GESTIÓN DE USUARIOS--------------
 
-// //VER LISTADO TODOS LOS USUARIOS (GET)
-// router.get('/users'/*, [validarJWT, validarRol('admin')] , controlador*/);
+// VER LISTADO TODOS LOS USUARIOS (GET)
+router.get('/users', [validarJWT, validarRol('admin')] , getAllUsers);
 
 // //VER FICHA DE UN USUARIO para cargar el formulario de editar (GET)
 // router.get('/users/:id'/*, [validarJWT, validarRol('admin')] , controlador*/);

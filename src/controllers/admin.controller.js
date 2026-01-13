@@ -226,7 +226,7 @@ const getAllReservas = async (req, res) => {
             .populate('usuario', 'nombre email telefono') // poblar el campo 'usuario' del modelo de reserva para ver sus datos
             .populate('vivienda', 'titulo ubicacion descripcion estado') //poblar vivienda para ver sus datos
 
-        if (reservas.lenght === 0) {
+        if (reservas.length === 0) {
             return res.status(200).json({// 200 porque la consulta se ha realizado bien (aunque este vacío)
                 ok: true,
                 msg: 'Todavía no hay ninguna reserva realizada',
@@ -254,7 +254,7 @@ const editReservaById = async (req, res) => {
     try {
         const { id } = req.params; // id de la reserva llega desde la URL
         //console.log(id, '--------id desde editarReserva admincontrollers------')
-         // Capturar datos del body - formulario front, en este caso solo puede cambiar el estado...ya lo iremos ampliando
+        // Capturar datos del body - formulario front, en este caso solo puede cambiar el estado...ya lo iremos ampliando
         const { estado } = req.body; //capturar el estado de la reserva que lo envia el ADMIN desde su panel
 
         // Verificar si reserva existe
@@ -303,6 +303,37 @@ const editReservaById = async (req, res) => {
     }
 }
 
+//---------------------GESTION DE USUARIOS-----------------------------
+
+const getAllUsers = async (req, res) => {
+    try {
+        //Buscar usuarios pero EXCLUIR password por seguridad
+        const usuarios = await User.find().select('-password -__v');
+
+        if (usuarios.length === 0) {
+            return res.status(200).json({// 200 porque la consulta se ha realizado bien (aunque este vacío)
+                ok: true,
+                msg: 'Todavía no hay ningun usuario registrado',
+                usuarios: [] //Mejor mandar algo, así el front no se rompe si está vacío
+            })
+        };
+        //respuesta favorable (200 OK) y devolver reservas
+        return res.status(200).json({
+            ok: true,
+            msg: 'Todos los usuarios obtenidos correctamente',
+            usuarios
+        });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al obtener todos los usuarios'
+        })
+    }
+}
+
+//Falta toda la gestión de usuarios
+
 module.exports = {
     createHouse,
     getAllHouses,
@@ -310,5 +341,6 @@ module.exports = {
     editHouseById,
     deleteHouseById,
     getAllReservas,
-    editReservaById
+    editReservaById,
+    getAllUsers
 }
