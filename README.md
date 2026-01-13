@@ -8,7 +8,7 @@ Este es el servidor de **HouseApp**, una aplicación de gestión de alquileres v
 * **Express**: Framework para la creación de la API REST.
 * **Express-Validator**: Middleware para validación de datos en las rutas.
 * **MongoDB & Mongoose**: Base de datos NoSQL y modelado de datos (viviendas, usuarios y reservas):
-    * `User`: Gestión de perfiles, roles y seguridad.
+    * `User`: Datos de usuario: email, teléfono, contraseña, rol...
     * `House`: Catálogo con títulos, descripciones detalladas y precios.
     * `Reserva`: Gestión de estancias, validación de fechas y huéspedes.
 * **JWT (JSON Web Tokens)**: Sistema de autenticación y protección de rutas.
@@ -55,6 +55,9 @@ Un aspecto fundamental del modelo `House` en Mongoose es el campo `imagenPrincpa
 
 ## Endpoints Principales
 
+- `/home` 
+  Página pública, vista inicial de la web app.
+
 - `/auth`  
   Registro, login, renovación de token y logout de usuarios.
 
@@ -62,7 +65,7 @@ Un aspecto fundamental del modelo `House` en Mongoose es el campo `imagenPrincpa
   Gestión completa de viviendas, reservas y usuarios (requiere rol administrador).
 
 - `/user`  
-  Visualización de viviendas, gestión de reservas propias, favoritos y perfil (requiere autenticación).
+  Visualización de viviendas, gestión de reservas propias, favoritos y perfil (requiere rol de user).
 
 ## Estructura de carpetas
     ```bash
@@ -74,6 +77,5 @@ Un aspecto fundamental del modelo `House` en Mongoose es el campo `imagenPrincpa
     /routes # Definición de rutas agrupadas por funcionalidad.
     /public/upload # Almacenamiento de imágenes subidas.
     /src/app.js # Punto de entrada principal del servidor.
-
-
+    
 Desarrollado por Sonia N.M. (Enero 2026)
