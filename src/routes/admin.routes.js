@@ -1,7 +1,7 @@
 // 1º importar express y router
 const express = require('express');
 const router = express.Router();
-const { check } = require('express-validator'); // lo usaremos mas adelante para validar
+const { check } = require('express-validator'); // lo usaremos para validar
 
 // 2º Importar controllers (funciones CRUD)
 const { createHouse,
@@ -11,7 +11,10 @@ const { createHouse,
     deleteHouseById,
     getAllReservas,
     editReservaById,
-    getAllUsers
+    getAllUsers,
+    getUserById,
+    editUserById,
+    deleteUserById
 } = require("../controllers/admin.controller")
 
 // 3º Importar Middlewares
@@ -73,16 +76,48 @@ router.put('/reservas/:id', [
 //-------------PANEL DE GESTIÓN DE USUARIOS--------------
 
 // VER LISTADO TODOS LOS USUARIOS (GET)
-router.get('/users', [validarJWT, validarRol('admin')] , getAllUsers);
+router.get('/users', [validarJWT, validarRol('admin')], getAllUsers);
 
-// //VER FICHA DE UN USUARIO para cargar el formulario de editar (GET)
-// router.get('/users/:id'/*, [validarJWT, validarRol('admin')] , controlador*/);
+// VER FICHA DE UN USUARIO para cargar el formulario de editar (GET)
+router.get('/users/:id', [validarJWT, validarRol('admin')], getUserById);
 
-// //EDITAR USUARIO (nombre, email, teléfono, rol...) (PUT)
-// router.put('/users/:id'/*, [validarJWT, validarRol('admin'), validarInputs], controlador*/);
+// EDITAR USUARIO (nombre, email, teléfono, rol...) (PUT)
+router.put('/users/:id', [
+    validarJWT,
+    validarRol('admin'),
+    check('nombre')
+        .toLowerCase()
+        .notEmpty().withMessage('El nombre es obligatorio')
+        .isLength({ min: 2 }).withMessage('El nombre debe tener al menos 2 caracteres')
+        .matches(/^[a-zA-ZÀ-ÿ\s]+$/).withMessage('El nombre solo puede contener letras'),
+    check('direccion')
+        .notEmpty().withMessage('La dirección es obligatoria')
+        .isLength({ min: 5 }).withMessage('La dirección debe tener al menos 5 caracteres')
+        .matches(/[a-zA-Z]/).withMessage('La dirección debe contener letras, no solo números'),
+    check('fechaNacimiento')
+        .notEmpty().withMessage('La fecha de nacimiento es obliagtoria')
+        .isISO8601().withMessage('Solo es válido el formato fecha de nacimiento YYYY-MM-DD') // ISO 8601 = formato estándar internac para fechas = YYYY-MM-DD
+        .custom((value) => { // funcion para que NO deje poner fechas de menores de 18 años
+            const fechaNacimiento = new Date(value);
+            const fechaHoy = new Date();
+            // Calcular la fecha límite (HOY - 18 años)-> obtener año, mes y dia de hace 18 años
+            const fechaLimite = new Date(
+                fechaHoy.getFullYear() - 18, //MÉTODOS del obj Date de JS. Devuelve año completo (2026) 
+                fechaHoy.getMonth(),  // Devuelve mes (0-11)
+                fechaHoy.getDate()  // Devuelve día del mes (1-31)
+            );
+            if (fechaNacimiento > fechaLimite) {
+                throw new Error('Debes ser mayor de 18 años para registrarte');
+            }
+            return true;
+        }),
+    check('email', 'El email no es válido').isEmail().toLowerCase(),
+    check('telefono', 'El teléfono es obligatorio y debe tener 9 dígitos').not().isEmpty().isLength({ min: 9, max: 9 }),
+    validarInputs
+], editUserById);
 
-// //ELIMINAR USUARIO (DELETE)
-// router.delete('/users/:id'/*, [validarJWT, validarRol('admin')] , controlador*/);
+//ELIMINAR USUARIO (DELETE)
+router.delete('/users/:id', [validarJWT, validarRol('admin')], deleteUserById);
 
 module.exports = router
 

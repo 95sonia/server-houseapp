@@ -5,7 +5,19 @@ const Reserva = require('../models/Reserva.model');
 const { saveImage } = require('../middlewares/upload');
 const { cleanImages } = require('../helpers/cleanImages');
 
-//CREAR NUEVA CASA 
+/**
+ * Crea una nueva vivienda en la base de datos.
+ * Requiere al menos una imagen subida mediante Multer.
+ * Guarda las imágenes en el servidor y almacena sus URLs.
+ *
+ * @async
+ * @function createHouse
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.body - Datos de la vivienda (titulo, precio, ubicación, etc.).
+ * @param {Array} req.files - Archivos de imagen subidos por Multer.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con la vivienda creada o error.
+ */
 const createHouse = async (req, res) => {
     try {
 
@@ -49,7 +61,16 @@ const createHouse = async (req, res) => {
     }
 }
 
-//VER TODAS LAS CASAS (Dashboard) 
+/**
+ * Obtiene todas las viviendas almacenadas en la base de datos.
+ * Usado principalmente para el dashboard de administración.
+ *
+ * @async
+ * @function getAllHouses
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el listado de viviendas.
+ */
 const getAllHouses = async (req, res) => {
     try {
         //1º Acceder a la BD con método find() de mongoose
@@ -71,8 +92,18 @@ const getAllHouses = async (req, res) => {
     }
 }
 
-//VER UNA CASA (Detalle) -> Veo que es la misma funcion que admin...se podría haber hecho solo una?
-const getHouseById = async (req, res) => {
+/**
+ * Obtiene una vivienda concreta a partir de su ID.
+ *
+ * @async
+ * @function getHouseById
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la vivienda.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con la vivienda encontrada o error 404.
+ */
+const getHouseById = async (req, res) => {//VER UNA CASA (Detalle) -> Veo que es la misma funcion que admin...se podría haber hecho solo una?
 
     //extraer el id en los params del endPoint = URL
     const { id } = req.params;
@@ -104,7 +135,23 @@ const getHouseById = async (req, res) => {
     }
 }
 
-//EDITAR CASA
+/**
+ * Edita una vivienda existente.
+ * Permite actualizar datos y gestionar imágenes:
+ * - Mantener imágenes existentes
+ * - Añadir nuevas
+ * - Eliminar las que ya no se usan del servidor
+ *
+ * @async
+ * @function editHouseById
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la vivienda.
+ * @param {Object} req.body - Datos actualizados de la vivienda.
+ * @param {Array} [req.files] - Nuevas imágenes subidas.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con la vivienda actualizada.
+ */
 const editHouseById = async (req, res) => {
     try {
         //extraer el id en los params
@@ -173,7 +220,20 @@ const editHouseById = async (req, res) => {
     }
 }
 
-// ELIMINAR CASA
+/**
+ * Elimina una vivienda por su ID.
+ * Borra también:
+ * - Las imágenes asociadas del servidor
+ * - Todas las reservas relacionadas con esa vivienda
+ *
+ * @async
+ * @function deleteHouseById
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la vivienda.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON confirmando la eliminación.
+ */
 const deleteHouseById = async (req, res) => {
     try {
         // buscar el id en los params del endPoint
@@ -215,8 +275,18 @@ const deleteHouseById = async (req, res) => {
     }
 }
 
-
-// VER TODAS LAS RESERVAS
+/**
+ * Obtiene todas las reservas del sistema.
+ * Incluye información relacionada de:
+ * - Usuario
+ * - Vivienda
+ *
+ * @async
+ * @function getAllReservas
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el listado de reservas.
+ */
 const getAllReservas = async (req, res) => {
     try {
         // Buscar todas las reservas
@@ -249,7 +319,22 @@ const getAllReservas = async (req, res) => {
     }
 }
 
-// MODIFICAR UNA RESERVA
+/**
+ * Modifica el estado de una reserva existente.
+ * Sincroniza automáticamente el estado de la vivienda asociada:
+ * - confirmada → reservada
+ * - cancelada / pendiente → disponible
+ *
+ * @async
+ * @function editReservaById
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la reserva.
+ * @param {Object} req.body - Datos a actualizar.
+ * @param {string} req.body.estado - Nuevo estado de la reserva.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con la reserva actualizada.
+ */
 const editReservaById = async (req, res) => {
     try {
         const { id } = req.params; // id de la reserva llega desde la URL
@@ -303,12 +388,22 @@ const editReservaById = async (req, res) => {
     }
 }
 
-//---------------------GESTION DE USUARIOS-----------------------------
+//---------------------GESTION DE USUARIOS-------------------------//
 
+/**
+ * Obtiene todos los usuarios registrados en el sistema.
+ * Excluye campos sensibles como password.
+ *
+ * @async
+ * @function getAllUsers
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el listado de usuarios.
+ */
 const getAllUsers = async (req, res) => {
     try {
         //Buscar usuarios pero EXCLUIR password por seguridad
-        const usuarios = await User.find().select('-password -__v');
+        const usuarios = await User.find().select('-password -__v -reservas -favoritos');
 
         if (usuarios.length === 0) {
             return res.status(200).json({// 200 porque la consulta se ha realizado bien (aunque este vacío)
@@ -332,7 +427,94 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-//Falta toda la gestión de usuarios
+const getUserById = async (req, res) => {
+    try {
+        const { id } = req.params;  //Coger ID de la URL
+        console.log(id, '---------> idUser desde getuserbyId admin controller----------------')
+        const user = await User.findById(id).select('-password -__v -reservas -favoritos -_id');
+        console.log(user, '----------Desde getUserById admin controller----------');
+
+        if (!user) { // Comprobar si user no existe en BD (404)
+            return res.status(404).json({
+                ok: false,
+                msg: 'El usuario no existe'
+            })
+        }
+        // Respuesta favorable y devolver user
+        return res.status(200).json({
+            ok: true,
+            msg: 'Usuario obtenido correctamente',
+            user
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al editar usuario'
+        })
+    }
+}
+
+const editUserById = async (req, res) => {
+    try {
+        // capturar id de los params (url)
+        const { id } = req.params;
+        // coger los datos del formulario (body)
+        const { nombre, direccion, fechaNacimiento, telefono, email, role } = req.body;
+        //Almacenar usuarioActualizado
+        const usuarioActualizado = await User.findByIdAndUpdate(id, { nombre, direccion, fechaNacimiento, telefono, email, role }, { new: true })
+        //Si no existe usuarioActualizado (404)
+        if (!usuarioActualizado) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario NO encontrado',
+            })
+        }
+        //Respuesta favorable (200) y devolver usuarioActualizado
+        return res.status(200).json({
+            ok: true,
+            msg: 'Usuario modificado correctamente',
+            user: usuarioActualizado
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al editar usuario',
+        })
+    }
+}
+
+const deleteUserById = async (req, res) => {
+    try {
+        // capturar id de los params (url)
+        const { id } = req.params;
+        const usuario = await User.findById(id);
+        //si no existe el usuario -> 404
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No se ha encontrado el usuario'
+            })
+        };
+        //Borrar USUARIO de BD con método findByIdAndDelete() de mongoose
+        await User.findByIdAndDelete(id);
+
+        // si existe responder (200 OK)
+        return res.status(200).json({
+            ok: true,
+            msg: 'Usuario eliminado correctamente'
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error interno del servidor al editar usuario'
+        })
+    }
+}
 
 module.exports = {
     createHouse,
@@ -342,5 +524,8 @@ module.exports = {
     deleteHouseById,
     getAllReservas,
     editReservaById,
-    getAllUsers
+    getAllUsers,
+    getUserById,
+    editUserById,
+    deleteUserById
 }

@@ -2,7 +2,16 @@ const User = require('../models/User.model');
 const House = require('../models/House.model');
 const Reserva = require('../models/Reserva.model');
 
-// VER TODAS LAS CASAS (USERDASHBOARD y VISTA PÚBLICA)
+/**
+ * Obtiene todas las viviendas.
+ * Usado tanto para el dashboard de usuario como para la vista pública.
+ *
+ * @async
+ * @function getAllHouses
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el listado de viviendas.
+ */
 const getAllHouses = async (req, res) => {
     try {
         //1º Acceder a la BD con método find() de mongoose
@@ -23,7 +32,17 @@ const getAllHouses = async (req, res) => {
     }
 }
 
-// VER DETALLE CASA (POR ID)
+/**
+ * Obtiene el detalle de una vivienda por su ID.
+ *
+ * @async
+ * @function getHouseById
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la vivienda.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con la vivienda encontrada o error 404.
+ */
 const getHouseById = async (req, res) => {
     //extraer el id en los params del endPoint = URL
     const { id } = req.params
@@ -56,6 +75,24 @@ const getHouseById = async (req, res) => {
     }
 }
 
+/**
+ * Crea una reserva para una vivienda concreta.
+ * El usuario se obtiene desde el token JWT.
+ * Calcula automáticamente el precio total según fechas y precio por noche.
+ *
+ * @async
+ * @function reservarHouse
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado (inyectado por middleware JWT).
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la vivienda.
+ * @param {Object} req.body - Datos de la reserva.
+ * @param {string} req.body.fechaEntrada - Fecha de entrada.
+ * @param {string} req.body.fechaSalida - Fecha de salida.
+ * @param {number} req.body.numeroHuespedes - Número de huéspedes.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con la reserva creada.
+ */
 // RESERVAR UNA CASA (por id) es enviar formulario de momento
 const reservarHouse = async (req, res) => {
     try {
@@ -109,7 +146,16 @@ const reservarHouse = async (req, res) => {
     }
 }
 
-
+/**
+ * Obtiene todas las reservas del usuario autenticado.
+ *
+ * @async
+ * @function verReservas
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con las reservas del usuario.
+ */
 // VER TODAS MIS RESERVAS
 const verReservas = async (req, res) => {
     try {
@@ -142,8 +188,16 @@ const verReservas = async (req, res) => {
     }
 };
 
-
-//VER TODOS MIS FAVORITOS
+/**
+ * Obtiene todas las viviendas marcadas como favoritas por el usuario.
+ *
+ * @async
+ * @function verFavoritos
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con las viviendas favoritas.
+ */
 const verFavoritos = async (req, res) => {
     try {
         // Sacar id del usuario de req
@@ -189,7 +243,18 @@ const verFavoritos = async (req, res) => {
     }
 }
 
-// AÑADIR A FAVORITOS (POR ID)
+/**
+ * Añade una vivienda a la lista de favoritos del usuario.
+ *
+ * @async
+ * @function addFavorito
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado.
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la vivienda.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el array de favoritos actualizado.
+ */
 const addFavorito = async (req, res) => {
 
     try {
@@ -240,6 +305,18 @@ const addFavorito = async (req, res) => {
     }
 }
 
+/**
+ * Elimina una vivienda de la lista de favoritos del usuario.
+ *
+ * @async
+ * @function deleteFavorito
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado.
+ * @param {Object} req.params - Parámetros de la URL.
+ * @param {string} req.params.id - ID de la vivienda.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el array de favoritos actualizado.
+ */
 // ELIMINAR FAVORITO (POR ID)
 const deleteFavorito = async (req, res) => {
     try {
@@ -280,12 +357,23 @@ const deleteFavorito = async (req, res) => {
     }
 }
 
+/**
+ * Obtiene el perfil del usuario autenticado.
+ * Excluye campos sensibles como password, role y datos internos.
+ *
+ * @async
+ * @function getPerfil
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con los datos del perfil.
+ */
 // VER MI PERFIL DE USUARIO
 const getPerfil = async (req, res) => {
     try {
         //Coger ID del token (gracias al middleware validarJWT)
         const idUser = req.uid;
-        console.log(idUser, 'es el idUser DESDE getPerfil-usercontrollers-------------')
+        //console.log(idUser, 'es el idUser DESDE getPerfil-usercontrollers-------------')
         //Buscar al usuario por su ID (hacer con algún método que NO traiga la contraseña)
         const user = await User.findById(idUser).select('-password -role -reservas -favoritos -_id -__v')
         console.log(user, 'es el user DESDE getPerfil-usercontrollers-------------')
@@ -311,6 +399,23 @@ const getPerfil = async (req, res) => {
     }
 }
 
+/**
+ * Actualiza los datos del perfil del usuario autenticado.
+ * Solo permite modificar campos básicos.
+ *
+ * @async
+ * @function updatePerfil
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado.
+ * @param {Object} req.body - Datos a actualizar.
+ * @param {string} req.body.nombre - Nombre del usuario.
+ * @param {string} req.body.direccion - Dirección del usuario.
+ * @param {string} req.body.fechaNacimiento - Fecha de nacimiento.
+ * @param {string} req.body.telefono - Teléfono.
+ * @param {string} req.body.email - Email.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el perfil actualizado.
+ */
 // MODIFICAR MIS DATOS PERFIL USUARIO
 const updatePerfil = async (req, res) => {
     try {

@@ -2,8 +2,25 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User.model');
 const { JWTGenerator } = require('../helpers/jwt');
 
-// FUNCION CREAR USUARIO NUEVO
-
+/**
+ * Registra un nuevo usuario en la base de datos.
+ * - Verifica que el email no esté duplicado
+ * - Encripta la contraseña con bcrypt
+ * - Genera un JWT y lo guarda en una cookie HTTP-only
+ *
+ * @async
+ * @function createUser
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.body - Datos del formulario de registro.
+ * @param {string} req.body.nombre - Nombre del usuario.
+ * @param {string} req.body.direccion - Dirección del usuario.
+ * @param {string} req.body.fechaNacimiento - Fecha de nacimiento del usuario.
+ * @param {string} req.body.email - Email del usuario.
+ * @param {string} req.body.password - Contraseña en texto plano.
+ * @param {string} req.body.telefono - Teléfono del usuario.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con los datos básicos del usuario creado.
+ */
 const createUser = async (req, res) => {
     try {
         //capturar los elementos del formulario de registro
@@ -30,7 +47,7 @@ const createUser = async (req, res) => {
 
         //guardamos usuario en BD con método save
         const savedUser = await user.save();
-        console.log(savedUser, 'savedUser desde authcontroller backend');
+        //console.log(savedUser, 'savedUser desde authcontroller backend');
 
         //generar token
         const payload = {
@@ -39,9 +56,9 @@ const createUser = async (req, res) => {
             role: savedUser.role
         }
         const token = await JWTGenerator(payload)
-        console.log({ token }, 'desde authcontroller backend')
+        //console.log({ token }, 'desde authcontroller backend')
 
-        // Configurar la cookie antes de enviar la respuesta JSON
+        // Configurar la cookie antes de enviar la respuesta JSON -------ESTO ESTA MAL----------HAY QUE CONFIGURARLO EN FRONTEND
         res.cookie('token', token, {
             httpOnly: true,
             maxAge: 3600000, // 1 hora
@@ -66,8 +83,21 @@ const createUser = async (req, res) => {
     }
 }
 
-
-// FUNCIÓN LOGIN
+/**
+ * Inicia sesión de un usuario.
+ * - Verifica email y contraseña
+ * - Genera un JWT
+ * - Guarda el token en una cookie HTTP-only
+ *
+ * @async
+ * @function loginUser
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} req.body - Datos de login.
+ * @param {string} req.body.email - Email del usuario.
+ * @param {string} req.body.password - Contraseña en texto plano.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con los datos del usuario autenticado.
+ */
 const loginUser = async (req, res) => {
     try {
         //Recoger el email y password del req.body
@@ -140,10 +170,24 @@ const loginUser = async (req, res) => {
     }
 }
 
-// FUNCIÓN RENOVAR TOKEN
-//Sirve para que cuando el usuario refresca la pág o entra en la app, el Frontend llama a esta función para recibir token nuevo, lo que reinicia contador de tiempo de la sesión.
-
-const renewToken = async (req, res) => {
+/**
+ * Renueva el token JWT del usuario autenticado.
+ * Se utiliza cuando el usuario recarga la aplicación
+ * o vuelve a entrar para mantener la sesión activa.
+ *
+ * Requiere middleware previo de validación de JWT
+ * que inyecte uid, nombre y role en el objeto req.
+ *
+ * @async
+ * @function renewToken
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {string} req.uid - ID del usuario autenticado.
+ * @param {string} req.nombre - Nombre del usuario.
+ * @param {string} req.role - Rol del usuario.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {Promise<void>} Respuesta JSON con el nuevo token y datos del usuario.
+ */
+const renewToken = async (req, res) => {//Sirve para que cuando el usuario refresca la pág o entra en la app, el Frontend llama a esta función para recibir token nuevo, lo que reinicia contador de tiempo de la sesión.
     // recoger uid y el nombre del req
     const { uid, nombre, role } = req;
     console.log(uid, nombre, role, '-> mis datos desde renewtoken backend');
@@ -168,7 +212,15 @@ const renewToken = async (req, res) => {
     })
 }
 
-//FUNCION LOGOUT
+/**
+ * Cierra la sesión del usuario.
+ * Elimina la cookie que contiene el JWT.
+ *
+ * @function logOut
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @returns {void} Respuesta JSON confirmando el cierre de sesión.
+ */
 const logOut = (req, res) => {
     res.clearCookie('token'); // Decir al navegador que destruya la cookie llamada 'token'
     return res.json({
